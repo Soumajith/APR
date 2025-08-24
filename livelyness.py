@@ -317,9 +317,9 @@ def main():
             break
     
     if test_success_count > NUM_CHALLENGES//2:
-        print("Liveness Detection: True ✅")
+        print(f"Liveness Detection: True ✅ || {test_success_count}/{NUM_CHALLENGES} passed !")
     else:
-        print("Liveness Detection: False ❌")
+        print(f"Liveness Detection: False ❌ || {test_success_count}/{NUM_CHALLENGES} passed !")
 
     cap.release(); cv2.destroyAllWindows()
 
