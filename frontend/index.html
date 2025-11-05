@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Attendance System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#2563eb",
+              secondary: "#1e3a8a",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .active {
+        background-color: rgba(255, 255, 255, 0.2);
+        font-weight: 600;
+      }
+
+      .success {
+        color: #10b981;
+      }
+
+      .error {
+        color: #ef4444;
+      }
+
+      .loader {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #2563eb;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 40px;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .active-section {
+        display: block;
+      }
+    </style>
+  </head>
+
+  <body
+    class="bg-gradient-to-br from-indigo-50 to-slate-100 dark:from-slate-900 dark:to-gray-800 min-h-screen flex flex-col items-center transition-colors duration-300"
+  >
+    <!-- ===== Navbar ===== -->
+    <nav
+      class="w-full bg-gradient-to-r from-secondary to-primary text-white shadow-lg flex justify-between items-center px-6 py-3"
+    >
+      <div class="flex items-center space-x-2">
+        <img src="./assets/logo.png" alt="Logo" class="w-8 h-8 rounded-full" />
+        <h1 class="text-lg sm:text-xl font-semibold">Smart Attendance</h1>
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <button
+          id="nav-register"
+          class="px-4 py-2 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium active"
+        >
+          Register
+        </button>
+        <button
+          id="nav-attendance"
+          class="px-4 py-2 rounded-lg hover:bg-white/20 transition font-medium"
+        >
+          Mark Attendance
+        </button>
+        <button
+          id="theme-toggle"
+          class="ml-2 p-2 rounded-full hover:bg-white/20 transition"
+          title="Toggle Dark Mode"
+        >
+          🌗
+        </button>
+      </div>
+    </nav>
+
+    <!-- ===== Main Content ===== -->
+    <main class="flex flex-col items-center w-full mt-6 px-4">
+      <!-- ==== Registration ==== -->
+      <section
+        id="register-section"
+        class="w-full max-w-md bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-xl active-section"
+      >
+        <h2
+          class="text-2xl font-semibold text-center text-gray-800 dark:text-gray-100 mb-4"
+        >
+          Student Registration
+        </h2>
+
+        <form id="register-form" class="flex flex-col">
+          <input
+            id="reg-name"
+            type="text"
+            placeholder="Full Name"
+            required
+            class="mb-3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          />
+          <input
+            id="reg-roll"
+            type="text"
+            placeholder="Roll Number"
+            required
+            class="mb-3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          />
+
+          <div
+            class="relative w-full aspect-[4/3] border-2 border-dashed border-primary/40 rounded-xl overflow-hidden flex items-center justify-center mb-3 bg-gray-50 dark:bg-gray-800"
+          >
+            <video
+              id="reg-video"
+              autoplay
+              playsinline
+              class="w-full h-full object-cover"
+            ></video>
+            <canvas id="reg-canvas" class="hidden w-full h-full"></canvas>
+
+            <div class="absolute bottom-3 flex gap-3">
+              <button
+                type="button"
+                id="reg-capture"
+                class="camera-btn bg-primary text-white px-4 py-2 rounded-full shadow-md hover:bg-primary/90 transition"
+              >
+                📸 Capture
+              </button>
+              <button
+                type="button"
+                id="reg-retry"
+                class="camera-btn bg-secondary text-white px-4 py-2 rounded-full shadow-md hover:bg-secondary/90 transition hidden"
+              >
+                🔄 Retry
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="submit-btn bg-gradient-to-r from-primary to-secondary text-white py-2 rounded-lg font-medium hover:opacity-90 transition"
+          >
+            Register
+          </button>
+        </form>
+
+        <div
+          id="register-response"
+          class="response mt-3 text-center text-sm font-medium"
+        ></div>
+      </section>
+
+      <!-- ==== Attendance ==== -->
+      <section
+        id="attendance-section"
+        class="w-full max-w-md bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-xl hidden"
+      >
+        <h2
+          class="text-2xl font-semibold text-center text-gray-800 dark:text-gray-100 mb-4"
+        >
+          Mark Attendance
+        </h2>
+
+        <form id="attendance-form" class="flex flex-col">
+          <input
+            id="att-roll"
+            type="text"
+            placeholder="Roll Number"
+            required
+            class="mb-3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          />
+          <input
+            id="att-course"
+            type="text"
+            placeholder="Course ID"
+            required
+            class="mb-3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          />
+
+          <div
+            class="relative w-full aspect-[4/3] border-2 border-dashed border-primary/40 rounded-xl overflow-hidden flex items-center justify-center mb-3 bg-gray-50 dark:bg-gray-800"
+          >
+            <video
+              id="att-video"
+              autoplay
+              playsinline
+              class="w-full h-full object-cover"
+            ></video>
+            <canvas id="att-canvas" class="hidden w-full h-full"></canvas>
+
+            <div class="absolute bottom-3 flex gap-3">
+              <button
+                type="button"
+                id="att-capture"
+                class="camera-btn bg-primary text-white px-4 py-2 rounded-full shadow-md hover:bg-primary/90 transition"
+              >
+                📸 Capture
+              </button>
+              <button
+                type="button"
+                id="att-retry"
+                class="camera-btn bg-secondary text-white px-4 py-2 rounded-full shadow-md hover:bg-secondary/90 transition hidden"
+              >
+                🔄 Retry
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            class="submit-btn bg-gradient-to-r from-primary to-secondary text-white py-2 rounded-lg font-medium hover:opacity-90 transition"
+          >
+            Mark Attendance
+          </button>
+        </form>
+
+        <div
+          id="attendance-response"
+          class="response mt-3 text-center text-sm font-medium"
+        ></div>
+      </section>
+    </main>
+
+    <!-- ===== Scripts ===== -->
+    <script type="module" src="./js/main.js"></script>
+
+    <!-- ===== Theme Toggle Script ===== -->
+    <script>
+      const themeToggle = document.getElementById("theme-toggle");
+      const html = document.documentElement;
+
+      themeToggle.addEventListener("click", () => {
+        html.classList.toggle("dark");
+        localStorage.setItem(
+          "theme",
+          html.classList.contains("dark") ? "dark" : "light"
+        );
+      });
+
+      // Persist user theme
+      if (localStorage.getItem("theme") === "dark") {
+        html.classList.add("dark");
+      }
+    </script>
+  </body>
+</html>
