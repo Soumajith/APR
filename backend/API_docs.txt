@@ -1,0 +1,34 @@
+API Name: /submit
+Function: Store student data with image processing
+Input Payload (multipart/form-data): name: string, roll: string, image: File (jpg/png)
+Output: {"success": True, "result": {...}} or {"success": False, "error": "string"}
+
+API Name: /mark_attendance
+Function: Match face and mark attendance for a student
+Input Payload (multipart/form-data): roll: string, course_id: string, image: File (jpg/png)
+Output: {"success": True, "status": "marked", "similarity": "number", "reason": ""} or {"success": False, "status": "unmarked", "similarity": "", "reason": "string"}
+
+API Name: /get_student/{roll}
+Function: Retrieve student details, return base64 image
+Input Payload: Path parameter: roll: string
+Output: {"success": True, "status": "found", "student_details": {...}} or {"success": False, "status": "not_found", "message": "No record found"}
+
+API Name: /delete_student/{roll}
+Function: Delete student record from the database
+Input Payload: Path parameter: roll: string
+Output: {"success": True, "message": "Student with roll X deleted successfully"} or {"success": False, "message": "No student found"}
+
+API Name: /attendance/by_date/{date}
+Function: Fetch attendance list for a particular date
+Input Payload: Path parameter: date: string
+Output: {"success": True, "date": "YYYY-MM-DD", "attendance": [...]} or {"success": False, "message": "No attendance found"}
+
+API Name: /attendance/by_course
+Function: Fetch attendance list filtered by date and course
+Input Payload (Query params): date: string, course: string
+Output: {"success": True, "date": "...", "course": "...", "students": [...]} or {"success": False, "message": "No records for given date & course"}
+
+API Name: /attendance/by_roll
+Function: Fetch attendance details of a student for a specific date
+Input Payload (Query params): date: string, roll: string
+Output: {"success": True, "date": "...", "roll": "...", "details": {...}} or {"success": False, "message": "Not marked for this date"}

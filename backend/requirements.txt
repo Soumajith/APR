@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+pydantic
+python-multipart
+typing-extensions
+python-dotenv
+motor
+ultralytics
+keras-facenet
+numpy
+opencv-python
+tensorflow
