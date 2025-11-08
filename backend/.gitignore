@@ -1,3 +1,5 @@
 .idea/
 .venv/
 .env
+logs/
+APR_attendance_proj.zip
