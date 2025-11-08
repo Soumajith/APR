@@ -22,10 +22,10 @@ class StudentData(BaseModel):
     image_data: bytes
     model_config = ConfigDict(extra='allow')
 
-app = FastAPI(title="AI Data Processing API", version="0.0.2")
+app = FastAPI(title="APR Project", version="0.0.2")
 logger.info("FastAPI app started.")
 
-@app.post("/submit")
+@app.post("/register")
 async def receive_data(
     name: str = Form(...),
     roll: str = Form(...),
@@ -38,7 +38,7 @@ async def receive_data(
         processed_data = await processor.process_input(name, roll, image)
 
         db = DBController()
-        result = await db.create_entry(processed_data)
+        result = await db.register_student(processed_data)
 
         logger.info(f"Data successfully stored for roll={roll}")
         return {"success": True, "result": result}
@@ -46,6 +46,45 @@ async def receive_data(
     except Exception as e:
         logger.error(f"Error in /submit for roll={roll}: {e}")
         return {"success": False, "error": str(e)}
+
+
+
+@app.post("/login")
+async def login(name: str = Form(...), roll: str = Form(...)):
+    try:
+        db = DBController()
+        student = await db.check_login(roll=roll, name=name)
+
+        if not student:
+            return {
+                "success": False,
+                "message": "Invalid credentials or student not found"
+            }
+
+        # Convert image to base64 for frontend dashboard display
+        image_bytes = student.get("image_data")
+        if image_bytes:
+            student["image_base64"] = base64.b64encode(image_bytes).decode("utf-8")
+
+        # Remove heavy fields before sending
+        student.pop("embedding", None)
+        student.pop("image_data", None)
+
+        return {
+            "success": True,
+            "message": "Login successful",
+            "student": student
+        }
+
+    except Exception as e:
+        logger.error(f"Error in /login: {e}")
+        return {
+            "success": False,
+            "message": "Internal server error",
+            "error": str(e)
+        }
+
+
 
 @app.post("/mark_attendance")
 async def mark_attendance(
