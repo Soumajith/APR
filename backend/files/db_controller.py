@@ -47,7 +47,7 @@ class DBController:
             raise e
 
     # ---------------- Student functions ---------------- #
-    async def create_entry(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    async def register_student(self, data: Dict[str, Any]) -> Dict[str, Any]:
         try:
             roll_raw = data.get("roll")
             if not roll_raw:
@@ -71,6 +71,22 @@ class DBController:
         except Exception as e:
             logger.error(f"{self.module_name} create_entry error: {e}")
             raise e
+
+    async def check_login(self, roll: str | None = None, name: str | None = None) -> dict | None:
+        if not roll and not name:
+            raise ValueError("Provide at least one of: roll or name")
+
+        query: Dict[str, Any] = {}
+        if roll:
+            query["roll"] = roll.strip().lower()
+        if name:
+            query["name"] = name.strip()
+
+        doc = await self.students.find_one(query)
+        if doc:
+            doc.pop("_id", None)  # remove MongoDB ObjectId for clean output
+            return doc
+        return None
 
     async def read_entry(self, query: Dict[str, Any]) -> Dict[str, Any]:
         try:

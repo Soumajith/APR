@@ -30,8 +30,8 @@ class DataProcessor:
             logger.info(f"{self.module_name}: read image for roll={roll}, size={len(image_bytes)} bytes")
 
             # Step 1: Liveliness
-            await self.ai_modules.check_liveliness(roll, image_bytes)
-            logger.info(f"{self.module_name}: liveliness check passed for roll={roll}")
+            # await self.ai_modules.check_liveliness(roll, image_bytes)
+            # logger.info(f"{self.module_name}: liveliness check passed for roll={roll}")
 
             # Step 2: Embeddings
             embedding = await self.ai_modules.create_embeddings(roll, image_bytes)

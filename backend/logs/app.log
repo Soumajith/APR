@@ -79,3 +79,8 @@
 2025-11-05 12:02:02 | INFO | DBController connected to collections: students, attendance
 2025-11-05 12:02:03 | INFO | DBController: attendance inserted for roll=cs12 date=2025-11-05 course=CS101
 2025-11-05 12:02:03 | INFO | Attendance marked for roll=cs12
+2025-11-08 19:27:41 | INFO | FastAPI app started.
+2025-11-08 19:36:08 | INFO | DBController initialized (v0.0.3)
+2025-11-08 19:36:08 | INFO | DBController connected to collections: students, attendance
+2025-11-08 19:36:23 | INFO | DBController initialized (v0.0.3)
+2025-11-08 19:36:23 | INFO | DBController connected to collections: students, attendance
