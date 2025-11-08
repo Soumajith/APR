@@ -55,3 +55,9 @@ tsconfig.tsbuildinfo
 # Optional: PM2 process logs and runtime data
 .pids/
 .pm2/
+
+/backend/.idea/
+/backend/.venv/
+/backend/.env
+/backend/logs/
+/backend/APR_attendance_proj.zip
