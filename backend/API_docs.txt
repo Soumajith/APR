@@ -1,21 +1,26 @@
 API Name: /submit
 Function: Store student data with image processing
-Input Payload (multipart/form-data): name: string, roll: string, image: File (jpg/png)
+Input Payload (multipart/form-data): name: string, roll: string (UPPER CASE) (UPPER CASE), image: File (jpg/png)
 Output: {"success": True, "result": {...}} or {"success": False, "error": "string"}
+
+API Name: /login
+Function: called when student wants to login
+Input Payload: name: string, roll: string (UPPER CASE) (UPPER CASE)
+Output:{ "success": True, "message": "Login successful", "student": {..}} or  { "success": False,"message": "Invalid credentials or student not found"}
 
 API Name: /mark_attendance
 Function: Match face and mark attendance for a student
-Input Payload (multipart/form-data): roll: string, course_id: string, image: File (jpg/png)
+Input Payload (multipart/form-data): roll: string (UPPER CASE), course_id: string, image: File (jpg/png)
 Output: {"success": True, "status": "marked", "similarity": "number", "reason": ""} or {"success": False, "status": "unmarked", "similarity": "", "reason": "string"}
 
 API Name: /get_student/{roll}
 Function: Retrieve student details, return base64 image
-Input Payload: Path parameter: roll: string
+Input Payload: Path parameter: roll: string (UPPER CASE)
 Output: {"success": True, "status": "found", "student_details": {...}} or {"success": False, "status": "not_found", "message": "No record found"}
 
 API Name: /delete_student/{roll}
 Function: Delete student record from the database
-Input Payload: Path parameter: roll: string
+Input Payload: Path parameter: roll: string (UPPER CASE)
 Output: {"success": True, "message": "Student with roll X deleted successfully"} or {"success": False, "message": "No student found"}
 
 API Name: /attendance/by_date/{date}
@@ -30,5 +35,5 @@ Output: {"success": True, "date": "...", "course": "...", "students": [...]} or 
 
 API Name: /attendance/by_roll
 Function: Fetch attendance details of a student for a specific date
-Input Payload (Query params): date: string, roll: string
+Input Payload (Query params): date: string, roll: string (UPPER CASE)
 Output: {"success": True, "date": "...", "roll": "...", "details": {...}} or {"success": False, "message": "Not marked for this date"}
