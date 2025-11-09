@@ -84,3 +84,24 @@
 2025-11-08 19:36:08 | INFO | DBController connected to collections: students, attendance
 2025-11-08 19:36:23 | INFO | DBController initialized (v0.0.3)
 2025-11-08 19:36:23 | INFO | DBController connected to collections: students, attendance
+2025-11-09 12:31:18 | INFO | FastAPI app started.
+2025-11-09 12:36:08 | INFO | FastAPI app started.
+2025-11-09 12:36:33 | INFO | /mark_attendance called (no roll from client)
+2025-11-09 12:36:33 | INFO | Received image of size 62494 bytes
+2025-11-09 12:36:36 | INFO | AIModules initialized (v0.0.1)
+2025-11-09 12:36:38 | INFO | DBController initialized (v0.0.3)
+2025-11-09 12:36:38 | INFO | DBController connected to collections: students, attendance
+2025-11-09 12:36:51 | INFO | DBController: fetched 3 students
+2025-11-09 12:36:51 | INFO | AIModules: matched roll=cs12 score=0.998
+2025-11-09 12:36:51 | INFO | DBController initialized (v0.0.3)
+2025-11-09 12:36:51 | INFO | DBController connected to collections: students, attendance
+2025-11-09 12:36:52 | INFO | DBController: attendance inserted for roll=cs12 date=2025-11-09 course=CS101
+2025-11-09 12:36:52 | INFO | Attendance marked for roll=cs12
+2025-11-09 12:41:14 | INFO | AIModules initialized (v0.0.1)
+2025-11-09 12:41:14 | INFO | FastAPI app started and models loaded.
+2025-11-09 14:11:56 | INFO | FastAPI app initialized (lazy model loading enabled).
+2025-11-09 14:12:04 | INFO | Loading AIModules (YOLO + FaceNet)...
+2025-11-09 14:12:06 | INFO | AIModules initialized (v0.0.2)
+2025-11-09 14:12:06 | INFO | AIModules loaded successfully.
+2025-11-09 14:12:45 | INFO | DBController initialized (v0.0.3)
+2025-11-09 14:12:45 | INFO | DBController connected to collections: students, attendance
