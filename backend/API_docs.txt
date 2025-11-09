@@ -1,4 +1,4 @@
-API Name: /submit
+API Name: /register
 Function: Store student data with image processing
 Input Payload (multipart/form-data): name: string, roll: string (UPPER CASE) (UPPER CASE), image: File (jpg/png)
 Output: {"success": True, "result": {...}} or {"success": False, "error": "string"}

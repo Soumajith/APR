@@ -6,6 +6,7 @@ pydantic
 typing-extensions
 python-dotenv
 motor
+dnspython
 
 ultralytics
 torch
