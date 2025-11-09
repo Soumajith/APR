@@ -1,4 +1,3 @@
-# files/AImodels.py
 import os
 import numpy as np
 import cv2
@@ -12,7 +11,7 @@ from files.logger import logger
 class AIModules:
     def __init__(self):
         self.module_name = "AIModules"
-        self.version = "0.0.1"
+        self.version = "0.0.2"
 
         # compute model path relative to project
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -22,7 +21,6 @@ class AIModules:
         try:
             self.detector = YOLO(model_path)
         except Exception as e:
-            # if YOLO load fails, keep attribute None but log
             logger.error(f"{self.module_name}: YOLO load failed: {e}")
             self.detector = None
 
@@ -108,7 +106,6 @@ class AIModules:
             # fetch students and compare
             db = DBController()
             students = await db.fetch_all_entries()
-
             if not students:
                 return {"matched_roll": None, "similarity": 0.0}
 
@@ -119,7 +116,6 @@ class AIModules:
                 if not emb:
                     continue
                 emb_arr = np.array(emb, dtype=np.float32)
-                # cosine
                 denom = (norm(input_embedding) * norm(emb_arr))
                 if denom == 0:
                     continue
@@ -132,11 +128,10 @@ class AIModules:
                 matched_roll = best_student.get("roll")
                 logger.info(f"{self.module_name}: matched roll={matched_roll} score={best_score:.3f}")
                 return {"matched_roll": matched_roll, "similarity": float(best_score)}
-            else:
-                logger.info(f"{self.module_name}: no good match (best={best_score:.3f})")
-                return {"matched_roll": None, "similarity": float(best_score if best_score >= 0 else 0.0)}
+
+            logger.info(f"{self.module_name}: no good match (best={best_score:.3f})")
+            return {"matched_roll": None, "similarity": float(best_score if best_score >= 0 else 0.0)}
 
         except Exception as e:
             logger.error(f"{self.module_name}: match_face failed for roll={roll}: {e}")
-            # return no match with reason logged
             return {"matched_roll": None, "similarity": 0.0}

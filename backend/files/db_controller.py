@@ -16,7 +16,7 @@ class DBController:
     def __init__(self):
         self.version = "0.0.3"
         self.module_name = "DBController"
-        self.client: AsyncIOMotorClient | None = None
+        self.client = AsyncIOMotorClient(MONGO_URI, serverSelectionTimeoutMS=5000)
         self.db = None
         self.students = None
         self.attendance = None
@@ -145,7 +145,6 @@ class DBController:
             student_attendance = {
                 "name": data.get("name"),
                 "roll": roll,
-                "time": data.get("time"),
                 "timestamp": data.get("timestamp"),
                 "status": data.get("status", "marked"),
                 "similarity": data.get("similarity", None)
