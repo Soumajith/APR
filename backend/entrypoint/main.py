@@ -2,7 +2,7 @@ import base64
 import sys
 import os
 from datetime import datetime
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from fastapi import FastAPI, UploadFile, Form, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ConfigDict
@@ -14,7 +14,9 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from files.db_controller import DBController
 from files.logger import logger
 from files.processing import DataProcessor
-from files.AImodels import AIModules
+
+if TYPE_CHECKING:
+    from files.AImodels import AIModules  # for type hints only (no runtime import)
 
 load_dotenv()
 
@@ -25,6 +27,8 @@ class StudentData(BaseModel):
     image_data: bytes
     model_config = ConfigDict(extra='allow')
 
+
+# -------------------------- FAST API config  --------------------------
 app = FastAPI(title="APR Project", version="0.0.3")
 
 # CORS so your separate UI can call this API
@@ -36,26 +40,28 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ---------------------------------------------------
-# Lazy-load the heavy models (fixes "no open ports")
-# ---------------------------------------------------
-AI: Optional[AIModules] = None
 
-def get_ai() -> AIModules:
-    """Initialize AIModules() once, on first use."""
+# initialize heavy import
+AI: Optional["AIModules"] = None
+
+def get_ai() -> "AIModules":
     global AI
     if AI is None:
+        from files.AImodels import AIModules  # Lazy import here
         logger.info("Loading AIModules (YOLO + FaceNet)...")
         AI = AIModules()
         logger.info("AIModules loaded successfully.")
     return AI
 
+
 logger.info("FastAPI app initialized (lazy model loading enabled).")
+
+
+#  -------------------------- ROUTES  --------------------------
 
 @app.get("/wakeup")
 def wakeup_call():
-    """Warm up model after app binds to port."""
-    get_ai()  # load models now (first request)
+    get_ai()
     return {"success": "true"}
 
 
@@ -64,7 +70,7 @@ async def receive_data(name: str = Form(...), roll: str = Form(...), image: Uplo
     try:
         logger.info(f"API /register called by roll={roll}")
 
-        processor = DataProcessor(ai_modules=get_ai())  # use global model
+        processor = DataProcessor(ai_modules=get_ai())  # reuse global models
         processed_data = await processor.process_input(name, roll, image)
 
         db = DBController()
