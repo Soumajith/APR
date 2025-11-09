@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: apr-backend
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn -k uvicorn.workers.UvicornWorker entrypoint.main:app --bind 0.0.0.0:8000 --timeout 180
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.8
+      - key: MONGO_URI
+        sync: false
+      - key: DB_NAME
+        sync: false
+      - key: COLLECTION_NAME_STUDENT
+        sync: false
+      - key: COLLECTION_NAME_ATTENDANCE
+        sync: false
+    healthCheckPath: /wakeup
