@@ -43,9 +43,6 @@ logger.info("FastAPI app started and models loaded.")
 def wakeup_call():
     return {"success": "true"}
 
-@app.get("/healthz")
-def healthz():
-    return {"ok": True, "version": app.version}
 
 @app.post("/register")
 async def receive_data(name: str = Form(...), roll: str = Form(...), image: UploadFile = File(...)):
