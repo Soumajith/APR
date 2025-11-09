@@ -1,13 +1,21 @@
 from fastapi import UploadFile
-from typing import Dict
+from typing import Dict, TYPE_CHECKING
 from files.logger import logger
-from files.AImodels import AIModules
+
+# Only for type hints; does NOT execute at runtime
+if TYPE_CHECKING:
+    from files.AImodels import AIModules
 
 class DataProcessor:
-    def __init__(self, ai_modules: AIModules | None = None):
+    def __init__(self, ai_modules: "AIModules"):
         self.version = "0.0.1"
         self.module_name = "DataProcessor"
-        self.ai_modules = ai_modules or AIModules()  # prefer injected global
+
+        # Require the caller to pass the lazily created instance from main.py
+        if ai_modules is None:
+            raise ValueError("DataProcessor requires an AIModules instance (inject via get_ai()).")
+        self.ai_modules = ai_modules
+
         logger.info(f"{self.module_name} initialized (v{self.version})")
 
     def info(self) -> dict:
@@ -28,10 +36,7 @@ class DataProcessor:
             image_bytes = await image.read()
             logger.info(f"{self.module_name}: read image for roll={roll}, size={len(image_bytes)} bytes")
 
-            # Step 1: Liveliness (optional)
-            # await self.ai_modules.check_liveliness(roll, image_bytes)
-
-            # Step 2: Embeddings
+            # Embeddings via injected, lazily-initialized AI instance
             embedding = await self.ai_modules.create_embeddings(roll, image_bytes)
             logger.info(f"{self.module_name}: embeddings created for roll={roll}")
 
@@ -47,4 +52,4 @@ class DataProcessor:
 
         except Exception as e:
             logger.error(f"{self.module_name} failed processing input for roll={roll}: {e}")
-            raise e
+            raise

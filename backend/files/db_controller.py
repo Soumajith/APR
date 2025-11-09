@@ -2,6 +2,9 @@
 from typing import Dict, Any, List
 from motor.motor_asyncio import AsyncIOMotorClient
 from files.logger import logger
+from typing import Dict, Any, List
+from motor.motor_asyncio import AsyncIOMotorClient
+from files.logger import logger
 from dotenv import load_dotenv
 import os
 
@@ -11,12 +14,11 @@ DB_NAME = os.getenv("DB_NAME")
 COLLECTION_NAME_STUDENT = os.getenv("COLLECTION_NAME_STUDENT")
 COLLECTION_NAME_ATTENDANCE = os.getenv("COLLECTION_NAME_ATTENDANCE")
 
-
 class DBController:
     def __init__(self):
         self.version = "0.0.3"
         self.module_name = "DBController"
-        self.client = AsyncIOMotorClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+        self.client: AsyncIOMotorClient | None = None
         self.db = None
         self.students = None
         self.attendance = None
@@ -31,11 +33,13 @@ class DBController:
         try:
             if not MONGO_URI:
                 raise ValueError("MONGO_URI not found in env")
-
             if not DB_NAME or not COLLECTION_NAME_STUDENT or not COLLECTION_NAME_ATTENDANCE:
                 raise ValueError("DB_NAME or collection env vars missing")
 
-            self.client = AsyncIOMotorClient(MONGO_URI)
+            # single place to create client
+            if self.client is None:
+                self.client = AsyncIOMotorClient(MONGO_URI, serverSelectionTimeoutMS=5000)
+
             self.db = self.client[DB_NAME]
             self.students = self.db[COLLECTION_NAME_STUDENT]
             self.attendance = self.db[COLLECTION_NAME_ATTENDANCE]
@@ -44,7 +48,10 @@ class DBController:
 
         except Exception as e:
             logger.error(f"{self.module_name} connection failed: {e}")
-            raise e
+            raise
+
+    # ... (rest of your CRUD methods unchanged) ...
+
 
     # ---------------- Student functions ---------------- #
     async def register_student(self, data: Dict[str, Any]) -> Dict[str, Any]:
