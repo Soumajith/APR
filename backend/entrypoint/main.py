@@ -2,6 +2,7 @@ import base64
 import sys
 import os
 from datetime import datetime
+from typing import Optional
 from fastapi import FastAPI, UploadFile, Form, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ConfigDict
@@ -19,7 +20,7 @@ load_dotenv()
 
 class StudentData(BaseModel):
     name: str
-    roll: str  # branch in roll should be in LOWER CASE -- check from frontend
+    roll: str
     course_id: str
     image_data: bytes
     model_config = ConfigDict(extra='allow')
@@ -35,12 +36,26 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Load heavy models ONCE (faster and cheaper on Render)
-AI = AIModules()
-logger.info("FastAPI app started and models loaded.")
+# ---------------------------------------------------
+# Lazy-load the heavy models (fixes "no open ports")
+# ---------------------------------------------------
+AI: Optional[AIModules] = None
+
+def get_ai() -> AIModules:
+    """Initialize AIModules() once, on first use."""
+    global AI
+    if AI is None:
+        logger.info("Loading AIModules (YOLO + FaceNet)...")
+        AI = AIModules()
+        logger.info("AIModules loaded successfully.")
+    return AI
+
+logger.info("FastAPI app initialized (lazy model loading enabled).")
 
 @app.get("/wakeup")
 def wakeup_call():
+    """Warm up model after app binds to port."""
+    get_ai()  # load models now (first request)
     return {"success": "true"}
 
 
@@ -49,7 +64,7 @@ async def receive_data(name: str = Form(...), roll: str = Form(...), image: Uplo
     try:
         logger.info(f"API /register called by roll={roll}")
 
-        processor = DataProcessor(ai_modules=AI)  # <-- reuse global models
+        processor = DataProcessor(ai_modules=get_ai())  # use global model
         processed_data = await processor.process_input(name, roll, image)
 
         db = DBController()
@@ -62,21 +77,20 @@ async def receive_data(name: str = Form(...), roll: str = Form(...), image: Uplo
         logger.error(f"Error in /register for roll={roll}: {e}")
         return {"success": False, "error": str(e)}
 
+
 @app.post("/login")
 async def login(name: str = Form(...), roll: str = Form(...)):
     try:
         db = DBController()
-        student = await db.check_login(roll=roll, name=name) if hasattr(db, "check_login") else await db.read_entry({"roll": roll})
+        student = await db.check_login(roll=roll, name=name)
 
         if not student or (name and student.get("name") != name):
             return {"success": False, "message": "Invalid credentials or student not found"}
 
-        # Convert image to base64 for frontend dashboard display
         image_bytes = student.get("image_data")
         if image_bytes:
             student["image_base64"] = base64.b64encode(image_bytes).decode("utf-8")
 
-        # Remove heavy fields before sending
         student.pop("embedding", None)
         student.pop("image_data", None)
 
@@ -86,36 +100,30 @@ async def login(name: str = Form(...), roll: str = Form(...)):
         logger.error(f"Error in /login: {e}")
         return {"success": False, "message": "Internal server error", "error": str(e)}
 
+
 @app.post("/mark_attendance")
-async def mark_attendance(
-    course_id: str = Form(...),
-    image: UploadFile = File(...)
-):
+async def mark_attendance(course_id: str = Form(...), image: UploadFile = File(...)):
     try:
-        logger.info(f"/mark_attendance called (no roll from client)")
+        logger.info("/mark_attendance called (no roll from client)")
 
-        # Validate image
         if image.content_type not in ("image/jpeg", "image/png"):
-            return {"success": False, "status": "unmarked", "similarity": "", "reason": "Only JPG/PNG allowed"}
+            return {"success": False, "status": "unmarked", "reason": "Only JPG/PNG allowed"}
 
-        # Read image and run matcher
         image_bytes = await image.read()
         logger.info(f"Received image of size {len(image_bytes)} bytes")
 
-        match = await AI.match_face("unknown", image_bytes)  # <-- reuse global models
+        match = await get_ai().match_face("unknown", image_bytes)
         matched_roll = match.get("matched_roll")
         similarity = match.get("similarity", "")
 
         if not matched_roll:
             return {"success": False, "status": "unmarked", "similarity": similarity, "reason": "No face match found"}
 
-        # Fetch matched student
         db = DBController()
         student = await db.read_entry({"roll": matched_roll})
         if not student:
             return {"success": False, "status": "unmarked", "similarity": similarity, "reason": "Student not found in DB"}
 
-        # Prepare attendance payload
         now = datetime.now()
         attendance_data = {
             "roll": matched_roll,
@@ -127,15 +135,14 @@ async def mark_attendance(
             "status": "marked"
         }
 
-        # Persist
         await db.insert_attendance(attendance_data)
         logger.info(f"Attendance marked for roll={matched_roll}")
-
         return {"success": True, "status": "marked", "similarity": similarity, "reason": ""}
 
     except Exception as e:
         logger.error(f"Error in mark_attendance: {e}")
-        return {"success": False, "status": "unmarked", "similarity": "", "reason": "Internal server error"}
+        return {"success": False, "status": "unmarked", "reason": "Internal server error"}
+
 
 @app.get("/get_student/{roll}")
 async def retrieve_student(roll: str):
@@ -157,7 +164,8 @@ async def retrieve_student(roll: str):
         return {"success": True, "status": "found", "student_details": student}
 
     except Exception as e:
-        return {"success": False, "status": "error", "message": "Internal server error", "error": str(e)}
+        return {"success": False, "status": "error", "message": str(e)}
+
 
 @app.delete("/delete_student/{roll}")
 async def delete_student_api(roll: str):
@@ -167,11 +175,11 @@ async def delete_student_api(roll: str):
 
         if result == "deleted":
             return {"success": True, "message": f"Student with roll {roll} deleted"}
-
         return {"success": False, "message": f"No student found with roll {roll}"}
 
     except Exception as e:
-        return {"success": False, "message": "Internal server error", "error": str(e)}
+        return {"success": False, "message": str(e)}
+
 
 @app.get("/attendance/by_date/{date}")
 async def get_attendance_by_date(date: str):
@@ -181,11 +189,11 @@ async def get_attendance_by_date(date: str):
 
         if not records:
             return {"success": False, "message": "No attendance found for this date"}
-
         return {"success": True, "date": date, "attendance": records}
 
     except Exception as e:
         return {"success": False, "error": str(e)}
+
 
 @app.get("/attendance/by_course")
 async def get_attendance_by_course(date: str, course: str):
@@ -195,11 +203,11 @@ async def get_attendance_by_course(date: str, course: str):
 
         if not result:
             return {"success": False, "message": "No records for given date & course"}
-
         return {"success": True, "date": date, "course": course, "students": result}
 
     except Exception as e:
         return {"success": False, "error": str(e)}
+
 
 @app.get("/attendance/by_roll")
 async def get_attendance_by_roll(date: str, roll: str):
@@ -209,7 +217,6 @@ async def get_attendance_by_roll(date: str, roll: str):
 
         if not result:
             return {"success": False, "message": "Not marked for this date"}
-
         return {"success": True, "date": date, "roll": roll, "details": result}
 
     except Exception as e:
