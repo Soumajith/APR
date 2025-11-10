@@ -1,4 +1,3 @@
-# files/logger.py
 import logging
 import os
 
@@ -7,20 +6,18 @@ class AppLogger:
         self.version = "0.0.0"
         self.module_name = "AppLogger"
 
-        # Project root: one level above this file
+        # Project root (one level above this file's folder)
         BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-        # Ensure logs directory inside project folder
+        # logs/app.log path
         log_dir = os.path.join(BASE_DIR, "logs")
         os.makedirs(log_dir, exist_ok=True)
-
-        # Log file path
         log_path = os.path.join(log_dir, "app.log")
+        self.log_path = log_path  # <-- expose path for API
 
-        self.logger = logging.getLogger("APR_Proj_Logger")
+        self.logger = logging.getLogger("AppLogger")
         self.logger.setLevel(logging.INFO)
 
-        # Add handler if not present (prevents duplicate handlers)
         if not self.logger.handlers:
             file_handler = logging.FileHandler(log_path)
             formatter = logging.Formatter(
@@ -30,17 +27,11 @@ class AppLogger:
             file_handler.setFormatter(formatter)
             self.logger.addHandler(file_handler)
 
-    def info(self, message: str):
-        self.logger.info(message)
-
-    def warning(self, message: str):
-        self.logger.warning(message)
-
-    def error(self, message: str):
-        self.logger.error(message)
+    def info(self, msg: str): self.logger.info(msg)
+    def warning(self, msg: str): self.logger.warning(msg)
+    def error(self, msg: str): self.logger.error(msg)
 
     def module_info(self) -> dict:
         return {"module_name": self.module_name, "version": self.version}
 
-# exported singleton
 logger = AppLogger()

@@ -1,5 +1,6 @@
 .idea/
 .venv/
 .env
-logs/
 APR_attendance_proj.zip
+files/__pycache__
+entrypoint/__pycache__
