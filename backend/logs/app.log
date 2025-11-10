@@ -232,3 +232,21 @@
 2025-11-10 15:05:40 | INFO | Data successfully stored for roll=2511AI06
 2025-11-10 15:06:31 | INFO | DBController initialized (v0.0.3)
 2025-11-10 15:06:31 | INFO | DBController connected to collections: students, attendance
+2025-11-10 15:23:16 | INFO | API /register called by roll=2511cs11
+2025-11-10 15:23:16 | INFO | DataProcessor initialized (v0.0.1)
+2025-11-10 15:23:16 | INFO | DataProcessor: read image for roll=2511cs11, size=57800 bytes
+2025-11-10 15:23:16 | INFO | AIModules: embeddings created for roll=2511cs11
+2025-11-10 15:23:16 | INFO | DataProcessor: embeddings created for roll=2511cs11
+2025-11-10 15:23:16 | INFO | DataProcessor: processing complete for roll=2511cs11
+2025-11-10 15:23:16 | INFO | DBController initialized (v0.0.3)
+2025-11-10 15:23:16 | INFO | DBController connected to collections: students, attendance
+2025-11-10 15:23:19 | INFO | DBController: inserted new roll=2511cs11
+2025-11-10 15:23:19 | INFO | Data successfully stored for roll=2511cs11
+2025-11-10 19:10:37 | INFO | Lifespan: shutting down FastAPI app. Reason: Received SIGTERM (Render deployment or service restart)
+2025-11-10 19:10:37 | INFO | Lifespan: released AI models from memory.
+2025-11-10 19:40:36 | INFO | FastAPI app initialized (lazy model loading enabled).
+2025-11-10 19:40:36 | INFO | Lifespan: warming up models...
+2025-11-10 19:40:36 | INFO | Loading AIModules (Face/Embed + Spoof)...
+2025-11-10 19:40:36 | INFO | AIModules init (v0.2.0) | FACE_MODEL_PATH=/home/deepgs/PycharmProjects/APR_Proj/models/yolov11n-face.pt | SPOOF_MODEL_PATH=/home/deepgs/PycharmProjects/APR_Proj/models/best.pt
+2025-11-10 19:40:36 | INFO | AIModules loaded.
+2025-11-10 19:40:36 | INFO | Lifespan: models ready.

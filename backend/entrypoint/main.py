@@ -138,7 +138,7 @@ async def login(name: str = Form(...), roll: str = Form(...)):
 @app.post("/spoof")
 async def spoof(
     image: UploadFile = File(...),
-    authorization: Optional[str] = Header(None)  # optional, keep if you need it later
+    authorization: Optional[str] = Header(None)
 ):
     try:
         content = await image.read()
@@ -159,32 +159,80 @@ async def spoof(
         logger.error(f"/spoof error: {e}\n{traceback.format_exc()}")
         return {"success": False, "reason": "Internal server error"}
 
+
 @app.post("/mark_attendance")
-async def mark_attendance(course_id: str = Form(...), image: UploadFile = File(...)):
+async def mark_attendance(
+    roll: str = Form(...),
+    course_id: str = Form(...),
+    image: UploadFile = File(...)
+):
     try:
-        logger.info("/mark_attendance called (no roll from client)")
+        logger.info(f"/mark_attendance called with provided roll={roll}")
+
+        # Validate file type
         if image.content_type not in ("image/jpeg", "image/png"):
-            return {"success": False, "status": "unmarked", "reason": "Only JPG/PNG allowed"}
+            return {
+                "success": False,
+                "status": "unmarked",
+                "similarity": "",
+                "reason": "Only JPG/PNG allowed"
+            }
 
         image_bytes = await image.read()
         logger.info(f"Received image of size {len(image_bytes)} bytes")
 
+        # Face match
         match = await get_ai().match_face("unknown", image_bytes)
-        matched_roll = match.get("matched_roll")
+        matched_roll_raw = (match.get("matched_roll") or "").strip()
         similarity = match.get("similarity", "")
 
+        # Normalize for comparison (DB stores roll in lowercase)
+        provided_roll = roll.strip().lower()
+        matched_roll = matched_roll_raw.lower()
+
+        # No face match at all
         if not matched_roll:
-            return {"success": False, "status": "unmarked", "similarity": similarity, "reason": "No face match found"}
+            return {
+                "success": False,
+                "status": "unmarked",
+                "similarity": similarity,
+                "reason": "No face match found"
+            }
 
         db = DBController()
-        student = await db.read_entry({"roll": matched_roll})
-        if not student:
-            return {"success": False, "status": "unmarked", "similarity": similarity, "reason": "Student not found in DB"}
+        matched_student = await db.read_entry({"roll": matched_roll})
+        if not matched_student:
+            return {
+                "success": False,
+                "status": "unmarked",
+                "similarity": similarity,
+                "reason": "Matched student not found in DB",
+                "details": {
+                    "roll": matched_roll_raw or "",
+                    "name": ""
+                }
+            }
 
+        # If the provided roll does NOT match the face-matched roll → do NOT mark attendance.
+        if matched_roll != provided_roll:
+            now = datetime.now().isoformat()
+            return {
+                "success": False,
+                "status": "unmarked",
+                "similarity": similarity,
+                "reason": f"Roll mismatch: face matched a different student ({matched_student.get('roll')}).",
+                "details": {
+                    "name": matched_student.get("name"),
+                    "roll": matched_student.get("roll"),
+                    "timestamp": now
+                }
+            }
+
+        # Provided roll matches the detected face → mark attendance.
         now = datetime.now()
         attendance_data = {
-            "roll": matched_roll,
-            "name": student.get("name"),
+            "roll": matched_student.get("roll"),
+            "name": matched_student.get("name"),
             "course": course_id,
             "timestamp": now.isoformat(),
             "date": now.strftime("%Y-%m-%d"),
@@ -193,23 +241,28 @@ async def mark_attendance(course_id: str = Form(...), image: UploadFile = File(.
         }
 
         await db.insert_attendance(attendance_data)
-        logger.info(f"Attendance marked for roll={matched_roll}")
-        payload = {
+        logger.info(f"Attendance marked for roll={matched_student.get('roll')}")
+
+        return {
             "success": True,
             "status": "marked",
             "similarity": similarity,
             "reason": "",
-            "details":{
-                "name":student.get("name"),
-                "roll":matched_roll,
-                "timestamp":now.isoformat()
+            "details": {
+                "name": matched_student.get("name"),
+                "roll": matched_student.get("roll"),
+                "timestamp": now.isoformat()
             }
         }
 
-        return payload
     except Exception as e:
         logger.error(f"Error in mark_attendance: {e}\n{traceback.format_exc()}")
-        return {"success": False, "status": "unmarked", "reason": "Internal server error"}
+        return {
+            "success": False,
+            "status": "unmarked",
+            "similarity": "",
+            "reason": "Internal server error"
+        }
 
 #--------------- view logs ----------
 def _tail_filter_log(
@@ -218,10 +271,6 @@ def _tail_filter_log(
     level: Optional[str],
     grep: Optional[str],
 ):
-    """
-    Read log file line-by-line, keep only the last `max_lines` lines after optional filters.
-    Uses deque to avoid loading whole file into memory.
-    """
     max_lines = max(1, min(max_lines, 5000))  # cap to avoid abuse
     level = (level or "").strip().upper() or None
     grep_low = (grep or "").lower() or None
@@ -256,9 +305,9 @@ def _tail_filter_log(
 @app.get("/logs", response_class=PlainTextResponse)
 def get_logs(
     lines: int = 200,
-    level: Optional[str] = None,   # e.g., INFO, WARNING, ERROR
-    grep: Optional[str] = None,    # substring match, case-insensitive
-    raw: bool = True               # return plain text when True; JSON when False
+    level: Optional[str] = None,
+    grep: Optional[str] = None,
+    raw: bool = True
 ):
     log_path = getattr(logger, "log_path", None)
     if not log_path:
