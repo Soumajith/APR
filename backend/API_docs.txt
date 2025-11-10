@@ -1,12 +1,19 @@
 API Name: /register
 Function: Store student data with image processing
-Input Payload (multipart/form-data): name: string, roll: string (UPPER CASE) (UPPER CASE), image: File (jpg/png)
+Input Payload (multipart/form-data): name: string, roll: string (UPPER CASE), image: File (jpg/png)
 Output: {"success": True, "result": {...}} or {"success": False, "error": "string"}
 
 API Name: /login
 Function: called when student wants to login
-Input Payload: name: string, roll: string (UPPER CASE) (UPPER CASE)
+Input Payload: name: string, roll: string (UPPER CASE)
 Output:{ "success": True, "message": "Login successful", "student": {..}} or  { "success": False,"message": "Invalid credentials or student not found"}
+
+
+API Name: /spoof
+Function: Detect whether an uploaded image is spoof (fake) or real using YOLO-based spoof detection
+Input Payload (multipart/form-data):  image: File (jpg/png)
+Output:  {"success": True| False , "is_spoof": true|false,..}
+
 
 API Name: /mark_attendance
 Function: Match face and mark attendance for a student

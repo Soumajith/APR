@@ -105,3 +105,130 @@
 2025-11-09 14:12:06 | INFO | AIModules loaded successfully.
 2025-11-09 14:12:45 | INFO | DBController initialized (v0.0.3)
 2025-11-09 14:12:45 | INFO | DBController connected to collections: students, attendance
+2025-11-09 22:44:02 | INFO | FastAPI app initialized (lazy model loading enabled).
+2025-11-09 22:44:13 | INFO | Loading AIModules (Face/Embed + Spoof)...
+2025-11-09 22:44:13 | INFO | AIModules initialized (v0.1.0)
+2025-11-09 22:44:13 | INFO | AIModules loaded.
+2025-11-09 22:46:07 | INFO | FastAPI app initialized (lazy model loading enabled).
+2025-11-09 22:46:42 | INFO | FastAPI app initialized (lazy model loading enabled).
+2025-11-09 22:47:01 | INFO | Loading AIModules (Face/Embed + Spoof)...
+2025-11-09 22:47:01 | INFO | AIModules initialized (v0.1.0)
+2025-11-09 22:47:01 | INFO | AIModules loaded.
+2025-11-09 22:47:04 | ERROR | AIModules: Spoof YOLO load failed: [Errno 2] No such file or directory: 'best.pt'
+2025-11-09 22:47:20 | ERROR | AIModules: Spoof YOLO load failed: [Errno 2] No such file or directory: 'best.pt'
+2025-11-09 22:47:25 | ERROR | AIModules: Spoof YOLO load failed: [Errno 2] No such file or directory: 'best.pt'
+2025-11-09 22:51:43 | INFO | FastAPI app initialized (lazy model loading enabled).
+2025-11-09 22:51:50 | INFO | Loading AIModules (Face/Embed + Spoof)...
+2025-11-09 22:51:50 | INFO | AIModules initialized (v0.1.0)
+2025-11-09 22:51:50 | INFO | AIModules loaded.
+2025-11-09 22:51:51 | ERROR | AIModules: Spoof YOLO load failed: [Errno 2] No such file or directory: 'models/best.pt'
+2025-11-09 22:52:25 | ERROR | AIModules: Spoof YOLO load failed: [Errno 2] No such file or directory: 'models/best.pt'
+2025-11-09 23:03:45 | INFO | FastAPI app initialized (lazy model loading enabled).
+2025-11-09 23:03:54 | INFO | Loading AIModules (Face/Embed + Spoof)...
+2025-11-09 23:03:54 | INFO | AIModules initialized (v0.1.0)
+2025-11-09 23:03:54 | INFO | AIModules loaded.
+2025-11-09 23:04:09 | ERROR | AIModules: Spoof YOLO load failed: [Errno 2] No such file or directory: 'models/best.pt'
+2025-11-09 23:10:50 | INFO | FastAPI app initialized (lazy model loading enabled).
+2025-11-09 23:11:06 | INFO | Loading AIModules (Face/Embed + Spoof)...
+2025-11-09 23:11:06 | INFO | AIModules init (v0.1.1) | FACE_MODEL_PATH=/home/deepgs/PycharmProjects/APR_Proj/models/yolov11n-face.pt | SPOOF_MODEL_PATH=/home/deepgs/PycharmProjects/APR_Proj/models/best.pt
+2025-11-09 23:11:06 | INFO | AIModules loaded.
+2025-11-09 23:11:07 | INFO | AIModules: Spoof YOLO model loaded from /home/deepgs/PycharmProjects/APR_Proj/models/best.pt
+2025-11-09 23:18:07 | INFO | FastAPI app initialized (lazy model loading enabled).
+2025-11-09 23:18:21 | INFO | Loading AIModules (Face/Embed + Spoof)...
+2025-11-09 23:18:21 | INFO | AIModules init (v0.1.1) | FACE_MODEL_PATH=/home/deepgs/PycharmProjects/APR_Proj/models/yolov11n-face.pt | SPOOF_MODEL_PATH=/home/deepgs/PycharmProjects/APR_Proj/models/best.pt
+2025-11-09 23:18:21 | INFO | AIModules loaded.
+2025-11-09 23:18:23 | INFO | AIModules: Spoof YOLO model loaded from /home/deepgs/PycharmProjects/APR_Proj/models/best.pt
+2025-11-09 23:44:27 | INFO | FastAPI app initialized (lazy model loading enabled).
+2025-11-09 23:45:59 | INFO | FastAPI app initialized (lazy model loading enabled).
+2025-11-09 23:46:07 | INFO | Loading AIModules (Face/Embed + Spoof)...
+2025-11-09 23:46:07 | INFO | AIModules init (v0.2.0) | FACE_MODEL_PATH=/home/deepgs/PycharmProjects/APR_Proj/models/yolov11n-face.pt | SPOOF_MODEL_PATH=/home/deepgs/PycharmProjects/APR_Proj/models/best.pt
+2025-11-09 23:46:07 | INFO | AIModules loaded.
+2025-11-09 23:46:09 | INFO | AIModules: Spoof YOLO model loaded from /home/deepgs/PycharmProjects/APR_Proj/models/best.pt
+2025-11-09 23:46:55 | INFO | API /register called by roll=CS15
+2025-11-09 23:46:55 | INFO | DataProcessor initialized (v0.0.1)
+2025-11-09 23:46:55 | INFO | DataProcessor: read image for roll=CS15, size=7542 bytes
+2025-11-09 23:46:58 | INFO | AIModules: YOLO face detector loaded.
+2025-11-09 23:47:00 | INFO | AIModules: FaceNet embedder loaded.
+2025-11-09 23:47:02 | INFO | AIModules: embeddings created for roll=CS15
+2025-11-09 23:47:02 | INFO | DataProcessor: embeddings created for roll=CS15
+2025-11-09 23:47:02 | INFO | DataProcessor: processing complete for roll=CS15
+2025-11-09 23:47:02 | INFO | DBController initialized (v0.0.3)
+2025-11-09 23:47:02 | INFO | DBController connected to collections: students, attendance
+2025-11-09 23:47:05 | INFO | DBController: inserted new roll=cs15
+2025-11-09 23:47:05 | INFO | Data successfully stored for roll=CS15
+2025-11-09 23:47:21 | INFO | DBController initialized (v0.0.3)
+2025-11-09 23:47:21 | INFO | DBController connected to collections: students, attendance
+2025-11-09 23:47:45 | INFO | /mark_attendance called (no roll from client)
+2025-11-09 23:47:45 | INFO | Received image of size 7542 bytes
+2025-11-09 23:47:45 | INFO | DBController initialized (v0.0.3)
+2025-11-09 23:47:45 | INFO | DBController connected to collections: students, attendance
+2025-11-09 23:47:46 | INFO | DBController: fetched 4 students
+2025-11-09 23:47:46 | INFO | AIModules: matched roll=cs15 score=1.000
+2025-11-09 23:47:46 | INFO | DBController initialized (v0.0.3)
+2025-11-09 23:47:46 | INFO | DBController connected to collections: students, attendance
+2025-11-09 23:47:49 | INFO | DBController: attendance inserted for roll=cs15 date=2025-11-09 course=CS102
+2025-11-09 23:47:49 | INFO | Attendance marked for roll=cs15
+2025-11-10 00:29:44 | INFO | FastAPI app initialized (lazy model loading enabled).
+2025-11-10 14:19:52 | INFO | FastAPI app initialized (lazy model loading enabled).
+2025-11-10 14:28:47 | INFO | API /register called by roll=2511CS09
+2025-11-10 14:28:47 | INFO | Loading AIModules (Face/Embed + Spoof)...
+2025-11-10 14:28:47 | INFO | AIModules init (v0.2.0) | FACE_MODEL_PATH=/home/deepgs/PycharmProjects/APR_Proj/models/yolov11n-face.pt | SPOOF_MODEL_PATH=/home/deepgs/PycharmProjects/APR_Proj/models/best.pt
+2025-11-10 14:28:47 | INFO | AIModules loaded.
+2025-11-10 14:28:47 | INFO | DataProcessor initialized (v0.0.1)
+2025-11-10 14:28:47 | INFO | DataProcessor: read image for roll=2511CS09, size=156145 bytes
+2025-11-10 14:28:51 | INFO | AIModules: YOLO face detector loaded.
+2025-11-10 14:28:53 | INFO | AIModules: FaceNet embedder loaded.
+2025-11-10 14:28:55 | INFO | AIModules: embeddings created for roll=2511CS09
+2025-11-10 14:28:55 | INFO | DataProcessor: embeddings created for roll=2511CS09
+2025-11-10 14:28:55 | INFO | DataProcessor: processing complete for roll=2511CS09
+2025-11-10 14:28:55 | INFO | DBController initialized (v0.0.3)
+2025-11-10 14:28:55 | INFO | DBController connected to collections: students, attendance
+2025-11-10 14:28:57 | INFO | DBController: inserted new roll=2511cs09
+2025-11-10 14:28:57 | INFO | Data successfully stored for roll=2511CS09
+2025-11-10 14:33:01 | INFO | DBController initialized (v0.0.3)
+2025-11-10 14:33:01 | INFO | DBController connected to collections: students, attendance
+2025-11-10 14:36:25 | INFO | FastAPI app initialized (lazy model loading enabled).
+2025-11-10 14:37:05 | INFO | FastAPI app initialized (lazy model loading enabled).
+2025-11-10 14:41:38 | INFO | DBController initialized (v0.0.3)
+2025-11-10 14:41:38 | INFO | DBController connected to collections: students, attendance
+2025-11-10 14:47:24 | INFO | DBController initialized (v0.0.3)
+2025-11-10 14:47:24 | INFO | DBController connected to collections: students, attendance
+2025-11-10 14:55:30 | INFO | FastAPI app initialized (lazy model loading enabled).
+2025-11-10 14:55:30 | INFO | Startup warm: initializing AI models...
+2025-11-10 14:55:30 | INFO | Loading AIModules (Face/Embed + Spoof)...
+2025-11-10 14:55:30 | INFO | AIModules init (v0.2.0) | FACE_MODEL_PATH=/home/deepgs/PycharmProjects/APR_Proj/models/yolov11n-face.pt | SPOOF_MODEL_PATH=/home/deepgs/PycharmProjects/APR_Proj/models/best.pt
+2025-11-10 14:55:30 | INFO | AIModules loaded.
+2025-11-10 14:55:30 | INFO | Startup warm: models ready.
+2025-11-10 15:01:48 | INFO | FastAPI app initialized (lazy model loading enabled).
+2025-11-10 15:01:48 | INFO | Startup warm: initializing AI models...
+2025-11-10 15:01:48 | INFO | Loading AIModules (Face/Embed + Spoof)...
+2025-11-10 15:01:48 | INFO | AIModules init (v0.2.0) | FACE_MODEL_PATH=/home/deepgs/PycharmProjects/APR_Proj/models/yolov11n-face.pt | SPOOF_MODEL_PATH=/home/deepgs/PycharmProjects/APR_Proj/models/best.pt
+2025-11-10 15:01:48 | INFO | AIModules loaded.
+2025-11-10 15:01:48 | INFO | Startup warm: models ready.
+2025-11-10 15:03:53 | INFO | FastAPI app initialized (lazy model loading enabled).
+2025-11-10 15:03:53 | INFO | Lifespan: warming up models...
+2025-11-10 15:03:53 | INFO | Loading AIModules (Face/Embed + Spoof)...
+2025-11-10 15:03:53 | INFO | AIModules init (v0.2.0) | FACE_MODEL_PATH=/home/deepgs/PycharmProjects/APR_Proj/models/yolov11n-face.pt | SPOOF_MODEL_PATH=/home/deepgs/PycharmProjects/APR_Proj/models/best.pt
+2025-11-10 15:03:53 | INFO | AIModules loaded.
+2025-11-10 15:03:53 | INFO | Lifespan: models ready.
+2025-11-10 15:04:23 | INFO | Lifespan: shutting down FastAPI app.
+2025-11-10 15:04:24 | INFO | FastAPI app initialized (lazy model loading enabled).
+2025-11-10 15:04:24 | INFO | Lifespan: warming up models...
+2025-11-10 15:04:24 | INFO | Loading AIModules (Face/Embed + Spoof)...
+2025-11-10 15:04:24 | INFO | AIModules init (v0.2.0) | FACE_MODEL_PATH=/home/deepgs/PycharmProjects/APR_Proj/models/yolov11n-face.pt | SPOOF_MODEL_PATH=/home/deepgs/PycharmProjects/APR_Proj/models/best.pt
+2025-11-10 15:04:24 | INFO | AIModules loaded.
+2025-11-10 15:04:24 | INFO | Lifespan: models ready.
+2025-11-10 15:05:29 | INFO | API /register called by roll=2511AI06
+2025-11-10 15:05:29 | INFO | DataProcessor initialized (v0.0.1)
+2025-11-10 15:05:29 | INFO | DataProcessor: read image for roll=2511AI06, size=1202535 bytes
+2025-11-10 15:05:33 | INFO | AIModules: YOLO face detector loaded.
+2025-11-10 15:05:35 | INFO | AIModules: FaceNet embedder loaded.
+2025-11-10 15:05:37 | INFO | AIModules: embeddings created for roll=2511AI06
+2025-11-10 15:05:37 | INFO | DataProcessor: embeddings created for roll=2511AI06
+2025-11-10 15:05:37 | INFO | DataProcessor: processing complete for roll=2511AI06
+2025-11-10 15:05:37 | INFO | DBController initialized (v0.0.3)
+2025-11-10 15:05:37 | INFO | DBController connected to collections: students, attendance
+2025-11-10 15:05:40 | INFO | DBController: inserted new roll=2511ai06
+2025-11-10 15:05:40 | INFO | Data successfully stored for roll=2511AI06
+2025-11-10 15:06:31 | INFO | DBController initialized (v0.0.3)
+2025-11-10 15:06:31 | INFO | DBController connected to collections: students, attendance
