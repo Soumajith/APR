@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Mark Student Attendance</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.16.0/dist/tf.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#2563eb",
+            secondary: "#1e3a8a"
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { scroll-behavior: smooth; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 to-slate-100 dark:from-slate-900 dark:to-gray-800 min-h-screen text-gray-800 dark:text-gray-100">
+
+  <nav class="w-full bg-gradient-to-r from-indigo-600 to-blue-500 dark:from-indigo-700 dark:to-blue-600 text-white shadow-lg flex items-center justify-between px-4 sm:px-6 py-4">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-full bg-white/30 flex items-center justify-center font-bold text-indigo-700">SA</div>
+      <div>
+        <h1 class="text-lg sm:text-xl font-semibold leading-none">Smart Attendance</h1>
+        <p class="text-xs opacity-90">Face-based attendance system</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2 sm:gap-4">
+      <button id="nav-attendance" class="px-3 py-2 text-sm sm:text-base rounded-md hover:bg-white/10 transition-colors font-medium">Mark Attendance</button>
+      <button id="logout" class="px-3 py-2 text-sm sm:text-base rounded-md hover:bg-white/10 transition-colors font-medium">Logout</button>
+      <button id="theme-toggle" class="ml-2 p-2 rounded-full hover:bg-white/10 transition-colors" title="Toggle dark mode">
+        <svg id="theme-icon-light" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm-7.071 0l-.707.707a1 1 0 001.414 1.414l.707-.707a1 1 0 00-1.414-1.414zM2 10a1 1 0 011-1h1a1 1 0 110 2H3a1 1 0 01-1-1zm15 0a1 1 0 011-1h1a1 1 0 110 2h-1a1 1 0 01-1-1zm-8.657-5.657l.707-.707a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414zm0 11.314l.707.707a1 1 0 00-1.414 1.414l-.707-.707a1 1 0 001.414-1.414z"></path></svg>
+        <svg id="theme-icon-dark" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+      </button>
+    </div>
+  </nav>
+
+  <main class="container mx-auto px-4 py-10 max-w-3xl">
+    <div class="bg-white dark:bg-slate-800 shadow-xl rounded-lg p-6 md:p-8">
+      <h2 class="text-3xl font-bold mb-6 text-center text-indigo-600 dark:text-indigo-400">Student Attendance</h2>
+
+      <video id="video" autoplay muted playsinline class="w-full h-auto max-w-2xl mx-auto rounded-lg bg-black transform -scale-x-100 border-2 border-gray-200 dark:border-gray-700"></video>
+
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 my-6">
+        <label for="course" class="sr-only">Select Course</label>
+        <select id="course" class="w-full sm:w-auto px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-slate-700 font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          <option value="CS5101">CS5101</option>
+          <option value="CS5102">CS5102</option>
+          <option value="CS5103">CS5103</option>
+          <option value="CS6103">CS6103</option>
+          <option value="CS6109">CS6109</option>
+          <option value="CE6132">CE6132</option>
+        </select>
+
+        <button id="capture" class="w-full sm:w-auto px-8 py-3 rounded-lg bg-indigo-600 text-white font-semibold shadow-md hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none disabled:bg-gray-400 disabled:cursor-not-allowed">
+          Loading camera...
+        </button>
+      </div>
+
+      <h3 class="text-2xl font-semibold mt-8 mb-4 text-center">Preview</h3>
+      <canvas id="preview" width="640" height="480" class="w-full h-auto max-w-2xl mx-auto rounded-lg bg-gray-200 dark:bg-slate-700 border-2 border-gray-200 dark:border-gray-700" aria-label="Captured photo preview"></canvas>
+
+      <div id="results" class="mt-6 p-4 bg-gray-100 dark:bg-slate-900 rounded-lg font-mono text-sm min-h-[80px] text-gray-700 dark:text-gray-300 whitespace-pre-wrap">Status messages will appear here...</div>
+    </div>
+  </main>
+
+  <canvas id="hiddenCanvas" class="hidden"></canvas>
+
+  <script type="module">
+    import { ATTENDANCE_API, DETECT_API } from './js/config.js';
+
+    // If ATTENDANCE_API is provided in config, use it; otherwise fallback to /mark_attendance
+    const MARK_ATTENDANCE_API = (typeof ATTENDANCE_API !== 'undefined' && ATTENDANCE_API) ? ATTENDANCE_API : '/mark_attendance';
+
+    const SPOOF_CLASS_ID = 0;
+    const REAL_CLASS_ID = 1;
+    const SPOOF_CONF_THRESHOLD = 0.8;
+    const REAL_CONF_THRESHOLD = 0.2;
+    const BLUR_THRESHOLD = 2.0;
+
+    // DOM
+    const video = document.getElementById('video');
+    const hiddenCanvas = document.getElementById('hiddenCanvas');
+    const preview = document.getElementById('preview');
+    const captureBtn = document.getElementById('capture');
+    const courseSel = document.getElementById('course');
+    const resultsEl = document.getElementById('results');
+    const logoutBtn = document.getElementById('logout');
+
+    let stream = null;
+
+    // Auth guard (simple)
+    (function authGuard(){
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      const name = localStorage.getItem('userName');
+      const roll = localStorage.getItem('userRoll');
+      if (!isLoggedIn || !name || !roll) {
+        alert('Login required');
+        window.location.href = '/login.html';
+        throw new Error('Not authenticated');
+      }
+    })();
+
+    async function startCamera() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: { width:640, height:480 }, audio: false });
+        video.srcObject = stream;
+        await video.play();
+        resultsEl.textContent = 'Camera started — ready.';
+        captureBtn.disabled = false;
+        captureBtn.textContent = 'Capture & Mark Attendance';
+      } catch (err) {
+        console.error(err);
+        resultsEl.textContent = 'Could not open camera: ' + (err.message || err);
+      }
+    }
+
+    function captureFrameDataURL() {
+      const w = video.videoWidth || 640, h = video.videoHeight || 480;
+      hiddenCanvas.width = w; hiddenCanvas.height = h;
+      const ctx = hiddenCanvas.getContext('2d');
+      ctx.save();
+      ctx.scale(-1, 1);
+      ctx.drawImage(video, -w, 0, w, h);
+      ctx.restore();
+      return hiddenCanvas.toDataURL('image/png');
+    }
+
+    function drawPreview(dataURL) {
+      const ctx = preview.getContext('2d');
+      const img = new Image();
+      img.onload = () => {
+        ctx.clearRect(0,0,preview.width, preview.height);
+        ctx.drawImage(img, 0, 0, preview.width, preview.height);
+      };
+      img.src = dataURL;
+    }
+
+    async function dataURLToBlob(dataURL) {
+      const res = await fetch(dataURL);
+      return await res.blob();
+    }
+
+    async function computeSharpness(dataURL) {
+      const img = new Image();
+      await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = dataURL; });
+      const tmp = document.createElement('canvas'); tmp.width = 224; tmp.height = 224;
+      const ctx = tmp.getContext('2d'); ctx.drawImage(img, 0, 0, tmp.width, tmp.height);
+      const tensor = tf.browser.fromPixels(tmp).toFloat().div(255).expandDims(0);
+      const sharpness = tf.tidy(() => {
+        const gray = tf.image.rgbToGrayscale(tensor);
+        const kernel = tf.tensor4d([0,1,0,1,-4,1,0,1,0], [3,3,1,1]);
+        const edges = tf.conv2d(gray, kernel, 1, 'valid');
+        const { variance } = tf.moments(edges);
+        return variance.dataSync()[0] * 1000;
+      });
+      tensor.dispose();
+      return sharpness;
+    }
+
+    captureBtn.addEventListener('click', async () => {
+      captureBtn.disabled = true;
+      resultsEl.textContent = 'Capturing...';
+
+      try {
+        // 1) Capture and preview
+        const dataURL = captureFrameDataURL();
+        drawPreview(dataURL);
+
+        // 2) Upload to detection API
+        resultsEl.textContent = 'Uploading image for detection...';
+        const blob = await dataURLToBlob(dataURL);
+        const fd = new FormData();
+        fd.append('image', blob, 'capture.png');
+        fd.append('course_id', courseSel.value || '');
+        const token = localStorage.getItem('authToken') || '';
+
+        const detectResp = await fetch(DETECT_API, { method: 'POST', headers: { Authorization: `Bearer ${token}` }, body: fd });
+        if (detectResp.status === 401) { localStorage.removeItem('authToken'); throw new Error('Unauthorized'); }
+        if (!detectResp.ok) throw new Error(`Detection API responded ${detectResp.status}`);
+        const detectJson = await detectResp.json();
+
+        // Normalise detections array from server
+        const detections = Array.isArray(detectJson.detections) ? detectJson.detections
+                         : Array.isArray(detectJson.details) ? detectJson.details
+                         : (Array.isArray(detectJson) ? detectJson : []);
+
+        if (!detections.length) {
+          resultsEl.textContent = 'No detections found on server.';
+          captureBtn.disabled = false;
+          return;
+        }
+
+        // Check spoof
+        const spoofDetected = detections.some(d => {
+          if (Array.isArray(d.probs)) return (d.probs[SPOOF_CLASS_ID] ?? 0) >= SPOOF_CONF_THRESHOLD;
+          return (Number(d.cls) === SPOOF_CLASS_ID) && (Number(d.conf ?? 0) >= SPOOF_CONF_THRESHOLD);
+        });
+        if (spoofDetected) {
+          resultsEl.textContent = '❌ Spoof detected — attendance blocked.';
+          captureBtn.disabled = false;
+          return;
+        }
+
+        // Filter real detections
+        const realDetections = detections.filter(d => {
+          if (Array.isArray(d.probs)) return (d.probs[REAL_CLASS_ID] ?? 0) >= REAL_CONF_THRESHOLD;
+          return (Number(d.cls) === REAL_CLASS_ID) && (Number(d.conf ?? 0) >= REAL_CONF_THRESHOLD);
+        });
+
+        if (!realDetections.length) {
+          resultsEl.textContent = '❌ No confident real face found. Improve lighting and try again.';
+          captureBtn.disabled = false;
+          return;
+        }
+
+        // Pick best detection
+        realDetections.sort((a,b) => {
+          const aScore = Array.isArray(a.probs) ? (a.probs[REAL_CLASS_ID] ?? a.conf) : a.conf;
+          const bScore = Array.isArray(b.probs) ? (b.probs[REAL_CLASS_ID] ?? b.conf) : b.conf;
+          return bScore - aScore;
+        });
+        const best = realDetections[0];
+
+        // Local blur check
+        resultsEl.textContent = `Real face found (conf ${Number(best.conf ?? 0).toFixed(2)}) — checking blur...`;
+        const sharpness = await computeSharpness(dataURL);
+        if (sharpness < BLUR_THRESHOLD) {
+          resultsEl.textContent = `Image too blurry (score ${sharpness.toFixed(2)}). Try again.`;
+          captureBtn.disabled = false;
+          return;
+        }
+
+        // Pre-check: ensure roll exists locally before sending attendance request
+        const storedRollRaw = localStorage.getItem('userRoll') || '';
+        const storedRollTrim = storedRollRaw.trim();
+        if (!storedRollTrim) {
+          resultsEl.textContent = 'Local roll number not found. Please login again.';
+          console.warn('userRoll missing in localStorage — aborting attendance POST.');
+          captureBtn.disabled = false;
+          return;
+        }
+
+        // Build form data for marking attendance (must match server signature)
+        resultsEl.textContent = 'Image OK — marking attendance...';
+        const fd2 = new FormData();
+        fd2.append('image', blob, 'capture.png');
+        fd2.append('course_id', courseSel.value || '');
+        // send the roll field (server will normalize/compare as lower-case)
+        fd2.append('roll', storedRollTrim);
+        fd2.append('detection_confidence', String(best.conf ?? 0));
+        fd2.append('detection_bbox', JSON.stringify([best.x1, best.y1, best.x2, best.y2]));
+        if (best.probs) fd2.append('detection_probs', JSON.stringify(best.probs));
+
+        const attendResp = await fetch(MARK_ATTENDANCE_API, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          body: fd2
+        });
+
+        if (attendResp.status === 401) { localStorage.removeItem('authToken'); throw new Error('Unauthorized'); }
+        if (!attendResp.ok) throw new Error(`Attendance API responded ${attendResp.status}`);
+        const attendJson = await attendResp.json();
+
+        // Handle server response (server uses attendJson.details with name/roll/timestamp)
+        const similarity = (attendJson.similarity ?? '').toString();
+        const serverStatus = attendJson.status || (attendJson.success ? 'marked' : 'unmarked');
+
+        if (attendJson.success) {
+          const details = attendJson.details || {};
+          const respName = ((details.name || '') + '').trim().toLowerCase();
+          const respRoll = ((details.roll || '') + '').trim().toLowerCase();
+          const respTime = details.timestamp || attendJson.time || 'N/A';
+
+          const storedName = (localStorage.getItem('userName') || '').trim().toLowerCase();
+          const storedRoll = (localStorage.getItem('userRoll') || '').trim().toLowerCase();
+
+          // If stored name & roll match server details, finalize
+          if (storedName && storedRoll && storedName === respName && storedRoll === respRoll) {
+            resultsEl.textContent = `✅ Attendance marked successfully!
+Name: ${details.name || 'Unknown'}
+Roll: ${details.roll || 'N/A'}
+Time: ${respTime}`;
+          } else {
+            // If server marked success but details don't match local data — show warning and do NOT consider it accepted locally
+            const safeStoredName = storedName ? storedName.toUpperCase() : 'UNKNOWN';
+            const safeStoredRoll = storedRoll || 'N/A';
+            const safeRespName = respName ? respName.toUpperCase() : 'UNKNOWN';
+            const safeRespRoll = respRoll || 'N/A';
+
+            resultsEl.textContent = `Server returned success but identity mismatch detected.
+              Local: ${safeStoredName} (${safeStoredRoll})
+              Server: ${safeRespName} (${safeRespRoll})
+              Similarity: ${similarity}
+              Server-reported status: ${serverStatus}
+
+              Attendance NOT accepted locally. Check server logs.`;
+                          console.warn('Server returned success but Name/Roll mismatch — user should check logs.');
+          }
+
+        } else {
+          // Non-successful response: present reason, similarity, details if present
+          const details = attendJson.details || {};
+          const matchedName = details.name || '';
+          const matchedRoll = details.roll || '';
+          const matchedTime = details.timestamp || '';
+
+          resultsEl.textContent = `Attendance not marked.
+Reason: ${attendJson.reason || attendJson.error || 'Unknown'}`;
+        }
+
+      } catch (err) {
+        console.error(err);
+        resultsEl.textContent = 'Error: ' + (err.message || err);
+      } finally {
+        captureBtn.disabled = false;
+      }
+    });
+
+    // Logout handler
+    logoutBtn.addEventListener('click', () => {
+      if (confirm('Logout?')) {
+        if (stream) stream.getTracks().forEach(t => t.stop());
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('userName');
+        localStorage.removeItem('userRoll');
+        window.location.href = '/login.html';
+      }
+    });
+
+    // init
+    (async function init(){
+      resultsEl.textContent = 'Starting...';
+      await startCamera();
+    })();
+  </script>
+</body>
+</html>

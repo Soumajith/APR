@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Smart Attendance — Register Student</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: { extend: { colors: { primary: "#2563eb", secondary: "#1e3a8a" } } }
+    };
+  </script>
+  <style>
+    body { background: linear-gradient(180deg,#f4f4f9,#fff); min-height:100vh; }
+    .card { max-width:640px; margin:40px auto; }
+    video { border-radius:8px; background:#111; width:100%; height:320px; object-fit:cover; transform:scaleX(-1); }
+    .hidden { display: none; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center">
+  <!-- NAV -->
+  <nav class="w-full bg-gradient-to-r from-secondary to-primary text-white shadow flex justify-between items-center px-6 py-3">
+    <div class="flex items-center gap-3">
+      <img src="./assets/logo.png" class="w-8 h-8 rounded-full" alt="logo" />
+      <div><h1 class="font-semibold">Smart Attendance</h1><div class="text-xs opacity-90">Register Student</div></div>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="/index.html" class="text-white/90 hover:underline">Home</a>
+      <a href="/login.html" class="text-white/90 hover:underline">Login</a>
+      <button id="nav-logout" class="hidden">Logout</button>
+    </div>
+  </nav>
+
+  <!-- Register Card -->
+  <main class="card bg-white rounded-2xl shadow-lg p-6">
+    <h2 class="text-2xl font-semibold mb-4">Register Student</h2>
+
+    <form id="register-form" class="space-y-4" autocomplete="off">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">Full name</label>
+          <input id="reg-name" name="name" type="text" required class="w-full px-3 py-2 border rounded-lg" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Roll number</label>
+          <input id="reg-roll" name="roll" type="text" required class="w-full px-3 py-2 border rounded-lg" />
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-2">Capture photo</label>
+        <div class="rounded-lg border border-dashed p-2">
+          <video id="reg-video" autoplay playsinline muted></video>
+          <canvas id="reg-canvas" class="hidden w-full" width="320" height="240"></canvas>
+          <div class="mt-2 flex gap-2">
+            <button type="button" id="reg-capture" class="bg-primary text-white px-4 py-2 rounded-lg">📸 Capture</button>
+            <button type="button" id="reg-retry" class="bg-secondary text-white px-4 py-2 rounded-lg hidden">🔁 Retry</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button type="submit" id="reg-submit" class="bg-primary text-white px-5 py-2 rounded-lg">Register</button>
+        <div id="register-response" class="text-sm"></div>
+      </div>
+    </form>
+  </main>
+
+  <footer class="mt-6 text-sm text-gray-600">&copy; <span id="year"></span> Smart Attendance</footer>
+
+  <!-- Module script uses your existing camera.js and api.js -->
+  <script type="module">
+    import { setupCamera, stopCamera, captureImage } from './js/camera.js';
+    import { postForm } from './js/api.js';
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // <<-- IMPORTANT: point to the mock server on port 8000 -->>
+    import { REGISTER_API } from './js/config.js';
+
+    const regVideo = document.getElementById('reg-video');
+    const regCanvas = document.getElementById('reg-canvas');
+    const regCapture = document.getElementById('reg-capture');
+    const regRetry = document.getElementById('reg-retry');
+    const registerResponse = document.getElementById('register-response');
+    const regForm = document.getElementById('register-form');
+    const regSubmitBtn = document.getElementById('reg-submit');
+    let regStream = null;
+    let regImageBlob = null;
+
+    // start camera immediately (with error handling)
+    (async () => {
+      try {
+        regStream = await setupCamera(regVideo);
+        registerResponse.textContent = 'Camera ready';
+      } catch (e) {
+        console.error('Camera start failed', e);
+        registerResponse.innerHTML = '<span class="text-red-600">Camera error. Allow camera or use another device.</span>';
+      }
+    })();
+
+    // Capture: draw current frame to canvas and get Blob
+    regCapture.addEventListener('click', async () => {
+      try {
+        regImageBlob = await captureImage(regVideo, regCanvas);
+      } catch (err) {
+        console.error('captureImage threw', err);
+        regImageBlob = null;
+      }
+
+      if (!regImageBlob) {
+        registerResponse.innerHTML = '<span class="text-red-600">Capture failed — please try again.</span>';
+        return;
+      }
+
+      // show canvas snapshot, hide live video
+      regCanvas.classList.remove('hidden');
+      regVideo.classList.add('hidden');
+
+      regCapture.classList.add('hidden');
+      regRetry.classList.remove('hidden');
+
+      // stop camera to free device
+      if (regStream) {
+        try { stopCamera(regStream); } catch (e) { /* ignore */ }
+        regStream = null;
+      }
+    });
+
+    // Retry: go back to live preview
+    regRetry.addEventListener('click', async () => {
+      regCanvas.classList.add('hidden');
+      regVideo.classList.remove('hidden');
+      regCapture.classList.remove('hidden');
+      regRetry.classList.add('hidden');
+      regImageBlob = null;
+      registerResponse.textContent = '';
+
+      try {
+        regStream = await setupCamera(regVideo);
+      } catch (e) {
+        console.error('Camera restart failed', e);
+        registerResponse.innerHTML = '<span class="text-red-600">Could not restart camera.</span>';
+      }
+    });
+
+    // Submit registration
+    regForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      registerResponse.textContent = '';
+      const name = document.getElementById('reg-name').value.trim();
+      const roll = document.getElementById('reg-roll').value.trim();
+
+      if (!regImageBlob) {
+        registerResponse.innerHTML = '<span class="text-red-600">Please capture a photo first.</span>';
+        return;
+      }
+
+      regSubmitBtn.disabled = true;
+      regSubmitBtn.textContent = 'Registering...';
+
+      try {
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('roll', roll);
+        formData.append('image', regImageBlob, 'photo.jpg');
+
+        // Use postForm from js/api.js (it does not set Content-Type)
+        const data = await postForm(REGISTER_API, formData);
+
+        if (data && data.success) {
+          registerResponse.innerHTML = '<span class="text-green-600">Registered successfully.</span>';
+          // Optionally clear the form / keep cropped image visible
+          // regForm.reset();
+        } else {
+          // postForm returns { success:false, error: ... } on failure
+          const msg = (data && (data.error || data.reason)) || 'Registration failed';
+          registerResponse.innerHTML = `<span class="text-red-600">${msg}</span>`;
+        }
+      } catch (err) {
+        console.error('Register error', err);
+        registerResponse.innerHTML = `<span class="text-red-600">Network or server error: ${err.message || String(err)}</span>`;
+      } finally {
+        regSubmitBtn.disabled = false;
+        regSubmitBtn.textContent = 'Register';
+      }
+    });
+  </script>
+</body>
+</html>

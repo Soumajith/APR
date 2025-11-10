@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Smart Attendance System</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Smart Attendance — Home</title>
+
+    <!-- Tailwind CDN (quick dev) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -12,259 +14,330 @@
           extend: {
             colors: {
               primary: "#2563eb",
-              secondary: "#1e3a8a",
-            },
-          },
-        },
+              secondary: "#1e3a8a"
+            }
+          }
+        }
       };
     </script>
+
     <style>
+      /* small local tweaks */
       .active {
-        background-color: rgba(255, 255, 255, 0.2);
+        background-color: rgba(255, 255, 255, 0.12);
         font-weight: 600;
       }
-
-      .success {
-        color: #10b981;
+      .btn {
+        @apply px-4 py-2 rounded-lg font-medium transition;
       }
-
-      .error {
-        color: #ef4444;
-      }
-
-      .loader {
-        border: 3px solid #f3f3f3;
-        border-top: 3px solid #2563eb;
-        border-radius: 50%;
-        width: 20px;
-        height: 20px;
-        animation: spin 1s linear infinite;
-        margin: 0 auto;
-      }
-
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
-
-      .loading {
+      /* hero (light + dark) */
+      .hero-illustration {
+        background: linear-gradient(180deg,#eef2ff 0,#fff 100%);
+        border-radius: 12px;
+        min-height: 220px;
         display: flex;
-        justify-content: center;
         align-items: center;
-        height: 40px;
+        justify-content: center;
+        color: #1e3a8a;
+        transition: background-color .2s ease, color .2s ease, box-shadow .2s ease;
       }
-
-      .hidden {
-        display: none;
+      .hero-illustration.p-6 {
+        padding: 1.5rem;
+        box-shadow: 0 6px 18px rgba(30,58,138,0.06);
       }
-
-      .active-section {
-        display: block;
+      html.dark .hero-illustration {
+        background: linear-gradient(180deg,#0b1220 0,#0f1724 100%);
+        color: #cfe3ff;
+        box-shadow: 0 6px 30px rgba(0,0,0,0.6);
+        border: 1px solid rgba(255,255,255,0.04);
       }
     </style>
   </head>
 
-  <body
-    class="bg-gradient-to-br from-indigo-50 to-slate-100 dark:from-slate-900 dark:to-gray-800 min-h-screen flex flex-col items-center transition-colors duration-300"
-  >
-    <!-- ===== Navbar ===== -->
-    <nav
-      class="w-full bg-gradient-to-r from-secondary to-primary text-white shadow-lg flex justify-between items-center px-6 py-3"
-    >
-      <div class="flex items-center space-x-2">
-        <img src="./assets/logo.png" alt="Logo" class="w-8 h-8 rounded-full" />
-        <h1 class="text-lg sm:text-xl font-semibold">Smart Attendance</h1>
+  <body class="bg-gradient-to-br from-indigo-50 to-slate-100 dark:from-slate-900 dark:to-gray-800 min-h-screen text-gray-800 dark:text-gray-100">
+    <!-- NAVBAR -->
+    <nav class="w-full bg-gradient-to-r from-secondary to-primary text-white shadow-lg flex items-center justify-between px-6 py-4">
+      <div class="flex items-center gap-3">
+        <img id="brand-logo" src="./assets/logo.png" alt="Logo" class="w-8 h-8 rounded-full object-cover" />
+        <div>
+          <h1 class="text-lg sm:text-xl font-semibold leading-none">Smart Attendance</h1>
+          <p class="text-xs opacity-90">Face-based attendance system</p>
+        </div>
       </div>
 
-      <div class="flex items-center space-x-3">
-        <button
-          id="nav-register"
-          class="px-4 py-2 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium active"
-        >
-          Register
-        </button>
-        <button
-          id="nav-attendance"
-          class="px-4 py-2 rounded-lg hover:bg-white/20 transition font-medium"
-        >
-          Mark Attendance
-        </button>
-        <button
-          id="theme-toggle"
-          class="ml-2 p-2 rounded-full hover:bg-white/20 transition"
-          title="Toggle Dark Mode"
-        >
-          🌗
-        </button>
+      <div class="flex items-center gap-3">
+        <!-- Mark attendance will point to standalone page, guarded by auth -->
+        <button id="nav-attendance" class="btn hover:bg-white/10">Mark Attendance</button>
+
+        <button id="theme-toggle" class="ml-2 p-2 rounded-full hover:bg-white/10 transition" title="Toggle dark mode">🌗</button>
       </div>
     </nav>
 
-    <!-- ===== Main Content ===== -->
-    <main class="flex flex-col items-center w-full mt-6 px-4">
-      <!-- ==== Registration ==== -->
-      <section
-        id="register-section"
-        class="w-full max-w-md bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-xl active-section"
-      >
-        <h2
-          class="text-2xl font-semibold text-center text-gray-800 dark:text-gray-100 mb-4"
-        >
-          Student Registration
-        </h2>
+    <!-- MAIN CONTENT -->
+    <main class="container mx-auto px-4 py-10 max-w-4xl">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+        <!-- Left: hero / quick actions -->
+        <section class="space-y-6">
+          <div class="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-lg">
+            <h2 class="text-2xl font-semibold mb-2">Welcome to Smart Attendance</h2>
+            <p class="text-gray-600 dark:text-gray-300 mb-4">
+              Use the web portal to register students and mark attendance using a webcam-based face matcher.
+              The marking page opens in a separate protected page after login.
+            </p>
 
-        <form id="register-form" class="flex flex-col">
-          <input
-            id="reg-name"
-            type="text"
-            placeholder="Full Name"
-            required
-            class="mb-3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-          />
-          <input
-            id="reg-roll"
-            type="text"
-            placeholder="Roll Number"
-            required
-            class="mb-3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-          />
-
-          <div
-            class="relative w-full aspect-[4/3] border-2 border-dashed border-primary/40 rounded-xl overflow-hidden flex items-center justify-center mb-3 bg-gray-50 dark:bg-gray-800"
-          >
-            <video
-              id="reg-video"
-              autoplay
-              playsinline
-              class="w-full h-full object-cover"
-            ></video>
-            <canvas id="reg-canvas" class="hidden w-full h-full"></canvas>
-
-            <div class="absolute bottom-3 flex gap-3">
-              <button
-                type="button"
-                id="reg-capture"
-                class="camera-btn bg-primary text-white px-4 py-2 rounded-full shadow-md hover:bg-primary/90 transition"
-              >
-                📸 Capture
-              </button>
-              <button
-                type="button"
-                id="reg-retry"
-                class="camera-btn bg-secondary text-white px-4 py-2 rounded-full shadow-md hover:bg-secondary/90 transition hidden"
-              >
-                🔄 Retry
+            <div class="flex flex-wrap gap-3">
+              <!-- We use JS navigation helpers (see script) -->
+              <a href="#" id="link-login" class="inline-block bg-primary text-white px-4 py-2 rounded-lg hover:opacity-90">Login</a>
+              <a href="#" id="link-register" class="inline-block bg-primary text-white px-4 py-2 rounded-lg hover:opacity-90">Register Student</a>
+              <button id="cta-mark-attendance" class="inline-block bg-secondary text-white px-4 py-2 rounded-lg hover:opacity-90">
+                Mark Attendance (opens protected page)
               </button>
             </div>
           </div>
 
-          <button
-            type="submit"
-            class="submit-btn bg-gradient-to-r from-primary to-secondary text-white py-2 rounded-lg font-medium hover:opacity-90 transition"
-          >
-            Register
-          </button>
-        </form>
+          <div class="hero-illustration p-6">
+            <!-- placeholder graphic / illustration -->
+            <div class="text-center max-w-sm">
+              <svg width="120" height="120" viewBox="0 0 24 24" fill="none" class="mx-auto mb-4 opacity-90" aria-hidden="true">
+                <rect x="1" y="3" width="22" height="18" rx="2" stroke="currentColor" stroke-width="1.2"></rect>
+                <circle cx="12" cy="10" r="2.5" stroke="currentColor" stroke-width="1.2"></circle>
+                <path d="M7 17c1.333-1.333 3.333-2 5-2s3.667.667 5 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+              <h3 class="text-lg font-semibold">Quick start</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">
+                Login → Open "Mark Attendance" → Capture → Mark. Keep markattendance page separate for security & camera permissions.
+              </p>
+            </div>
+          </div>
+        </section>
 
-        <div
-          id="register-response"
-          class="response mt-3 text-center text-sm font-medium"
-        ></div>
-      </section>
+        <!-- Right: status & instructions -->
+        <aside class="space-y-6">
+          <div class="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-lg">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-lg font-semibold mb-2">Status</h3>
+                <p id="user-status" class="text-sm text-gray-600 dark:text-gray-300">
+                  Checking login status...
+                </p>
+              </div>
+              <div class="text-right">
+                <div id="status-actions" class="space-y-2">
+                  <!-- filled by JS -->
+                </div>
+              </div>
+            </div>
 
-      <!-- ==== Attendance ==== -->
-      <section
-        id="attendance-section"
-        class="w-full max-w-md bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-xl hidden"
-      >
-        <h2
-          class="text-2xl font-semibold text-center text-gray-800 dark:text-gray-100 mb-4"
-        >
-          Mark Attendance
-        </h2>
-
-        <form id="attendance-form" class="flex flex-col">
-          <input
-            id="att-roll"
-            type="text"
-            placeholder="Roll Number"
-            required
-            class="mb-3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-          />
-          <input
-            id="att-course"
-            type="text"
-            placeholder="Course ID"
-            required
-            class="mb-3 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:outline-none dark:bg-gray-800 dark:border-gray-700 dark:text-white"
-          />
-
-          <div
-            class="relative w-full aspect-[4/3] border-2 border-dashed border-primary/40 rounded-xl overflow-hidden flex items-center justify-center mb-3 bg-gray-50 dark:bg-gray-800"
-          >
-            <video
-              id="att-video"
-              autoplay
-              playsinline
-              class="w-full h-full object-cover"
-            ></video>
-            <canvas id="att-canvas" class="hidden w-full h-full"></canvas>
-
-            <div class="absolute bottom-3 flex gap-3">
-              <button
-                type="button"
-                id="att-capture"
-                class="camera-btn bg-primary text-white px-4 py-2 rounded-full shadow-md hover:bg-primary/90 transition"
-              >
-                📸 Capture
-              </button>
-              <button
-                type="button"
-                id="att-retry"
-                class="camera-btn bg-secondary text-white px-4 py-2 rounded-full shadow-md hover:bg-secondary/90 transition hidden"
-              >
-                🔄 Retry
-              </button>
+            <div class="mt-4">
+              <h4 class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Notes</h4>
+              <ul class="list-disc pl-5 text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                <li>Mark attendance page uses the webcam — allow permissions.</li>
+                <li>Marking requires a valid login token (saved in localStorage after login).</li>
+                <li>You can logout from the markattendance page when needed.</li>
+              </ul>
             </div>
           </div>
 
-          <button
-            type="submit"
-            class="submit-btn bg-gradient-to-r from-primary to-secondary text-white py-2 rounded-lg font-medium hover:opacity-90 transition"
-          >
-            Mark Attendance
-          </button>
-        </form>
-
-        <div
-          id="attendance-response"
-          class="response mt-3 text-center text-sm font-medium"
-        ></div>
-      </section>
+          
+        </aside>
+      </div>
     </main>
 
-    <!-- ===== Scripts ===== -->
+    <!-- FOOTER -->
+    <footer class="w-full text-center py-6 text-sm text-gray-500 dark:text-gray-400">
+      &copy; <span id="year"></span> Smart Attendance — Built with ❤️
+    </footer>
+
+    <!-- Main client script (module) -->
     <script type="module" src="./js/main.js"></script>
 
-    <!-- ===== Theme Toggle Script ===== -->
+    <!-- Inline small script to wire CTA button and status text -->
     <script>
-      const themeToggle = document.getElementById("theme-toggle");
-      const html = document.documentElement;
+      // --------------------------------------------------------------------
+      // Utility: buildUrl(filename)
+      //  - Tries a few likely locations based on current page and server root.
+      //  - Probes each candidate with HEAD (or GET fallback) to check existence.
+      //  - Resolves to the first reachable URL (status 200), or rejects with tried list.
+      // --------------------------------------------------------------------
+      async function probeUrl(url) {
+        try {
+          // Some servers block HEAD; try HEAD first, then fallback to GET
+          let res = await fetch(url, { method: 'HEAD' });
+          if (res && (res.status === 200 || res.status === 0)) return res;
+          // fallback to GET if HEAD didn't return 200
+          res = await fetch(url, { method: 'GET' });
+          if (res && res.status === 200) return res;
+          return res;
+        } catch (e) {
+          return null;
+        }
+      }
 
-      themeToggle.addEventListener("click", () => {
-        html.classList.toggle("dark");
-        localStorage.setItem(
-          "theme",
-          html.classList.contains("dark") ? "dark" : "light"
-        );
+      async function buildUrl(filename) {
+        // Normalize filename (no leading slash)
+        filename = String(filename || '').replace(/^\//, '');
+
+        // Current directory (path without the filename)
+        const currentDir = location.pathname.replace(/\/[^\/]*$/, '');
+        const origin = location.origin;
+
+        // Candidate list (in order of preference)
+        const candidates = [
+          // Same folder as current page: ./filename
+          `${origin}${currentDir}/${filename}`,
+          // Root-relative: /filename (useful if dev server serves frontend as root)
+          `${origin}/${filename}`,
+          // Root-relative under a guessed 'frontend' folder (helpful for common setups)
+          `${origin}/APR/frontend/${filename}`,
+        ];
+
+        const tried = [];
+        for (const url of candidates) {
+          tried.push(url);
+          const res = await probeUrl(url);
+          if (res && res.status === 200) {
+            return { url, tried };
+          }
+        }
+
+        // nothing worked
+        return { url: null, tried };
+      }
+
+      // Helper to navigate after validating the target exists
+      async function smartNavigate(filename, { fallbackMessage } = {}) {
+        const { url, tried } = await buildUrl(filename);
+        if (url) {
+          location.href = url;
+          return true;
+        } else {
+          console.warn('Failed to find file. Tried:', tried);
+          alert(fallbackMessage || `Could not find ${filename}. Tried:\n` + tried.join('\n'));
+          return false;
+        }
+      }
+
+      // Wire up top-level controls and links reliably
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      // use safe DOM lookups
+      const ctaBtn = document.getElementById('cta-mark-attendance');
+      const navAttendance = document.getElementById('nav-attendance');
+      const linkLogin = document.getElementById('link-login');
+      const linkRegister = document.getElementById('link-register');
+      const userStatusEl = document.getElementById('user-status');
+      const statusActions = document.getElementById('status-actions');
+
+      // Read known localStorage values
+      const token = localStorage.getItem('authToken');
+      const userName = localStorage.getItem('userName');
+      const userRoll = (localStorage.getItem('userRoll') || '').trim();
+
+      // Display status and actions
+      if (token && userName) {
+        userStatusEl.innerHTML = `<strong>Signed in as:</strong> ${escapeHtml(userName)}<br><small class="text-xs text-gray-500">Roll: ${escapeHtml(userRoll || 'N/A')}</small>`;
+        statusActions.innerHTML = `
+          <div class="space-y-2">
+            <button id="btn-open-mark" class="w-full bg-primary text-white px-3 py-1 rounded">Open Mark Attendance</button>
+            <button id="btn-logout" class="w-full border border-white/20 text-white px-3 py-1 rounded">Logout</button>
+          </div>
+        `;
+        // attach event listeners for dynamically added buttons
+        document.getElementById('btn-open-mark').addEventListener('click', async () => {
+          // require roll present, otherwise ask to login again
+          if (!userRoll) {
+            alert('Local roll missing — please login again.');
+            await smartNavigate('login.html', { fallbackMessage: 'Please open the login page manually.' });
+            return;
+          }
+          // open markattendance page (validate location first)
+          const ok = await smartNavigate('markattendance.html', { fallbackMessage: 'Mark attendance page not found. Check your build/server.' });
+          if (ok) return;
+        });
+        document.getElementById('btn-logout').addEventListener('click', () => {
+          if (!confirm('Logout?')) return;
+          // stop any app-specific things (no stream here) and clear storage
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('isLoggedIn');
+          localStorage.removeItem('userName');
+          localStorage.removeItem('userRoll');
+          // reload page to reflect status
+          location.reload();
+        });
+      } else {
+        userStatusEl.innerHTML = `Not signed in. <a id="small-login-link" class="text-primary underline" href="#">Login</a> or <a id="small-register-link" class="text-primary underline" href="#">Register student</a>.`;
+        statusActions.innerHTML = `
+          <div class="space-y-2">
+            <button id="btn-open-login" class="w-full bg-primary text-white px-3 py-1 rounded">Go to Login</button>
+          </div>
+        `;
+        document.getElementById('btn-open-login').addEventListener('click', async () => {
+          await smartNavigate('login.html', { fallbackMessage: 'Login page not found. Serve the frontend folder or open the correct URL.' });
+        });
+        // wire inline text links
+        document.getElementById('small-login-link').addEventListener('click', async (e) => {
+          e.preventDefault();
+          await smartNavigate('login.html', { fallbackMessage: 'Login page not found.' });
+        });
+        document.getElementById('small-register-link').addEventListener('click', async (e) => {
+          e.preventDefault();
+          await smartNavigate('register.html', { fallbackMessage: 'Register page not found.' });
+        });
+      }
+
+      // top CTA / nav handlers
+      ctaBtn.addEventListener('click', async () => {
+        if (!token) {
+          alert('Please login first to mark attendance.');
+          await smartNavigate('login.html');
+          return;
+        }
+        if (!userRoll) {
+          alert('Roll number missing from localStorage. Please login again.');
+          await smartNavigate('login.html');
+          return;
+        }
+        await smartNavigate('markattendance.html', { fallbackMessage: 'markattendance.html not found. Check your server root or file location.' });
       });
 
-      // Persist user theme
-      if (localStorage.getItem("theme") === "dark") {
-        html.classList.add("dark");
+      navAttendance.addEventListener('click', async () => {
+        // identical logic to CTA
+        if (!token) {
+          alert('Please login first to mark attendance.');
+          await smartNavigate('login.html');
+          return;
+        }
+        if (!userRoll) {
+          alert('Roll number missing from localStorage. Please login again.');
+          await smartNavigate('login.html');
+          return;
+        }
+        await smartNavigate('markattendance.html');
+      });
+
+      // header login/register explicit links
+      linkLogin.addEventListener('click', async (e) => {
+        e.preventDefault();
+        await smartNavigate('login.html');
+      });
+      linkRegister.addEventListener('click', async (e) => {
+        e.preventDefault();
+        await smartNavigate('register.html');
+      });
+
+      // Theme toggle (keeps local preference)
+      const themeToggle = document.getElementById('theme-toggle');
+      function applyTheme(dark) {
+        document.documentElement.classList.toggle('dark', Boolean(dark));
+        localStorage.setItem('darkMode', dark ? '1' : '');
+      }
+      // hydrate theme from localStorage (if set)
+      applyTheme(!!localStorage.getItem('darkMode'));
+      themeToggle.addEventListener('click', () => { applyTheme(!document.documentElement.classList.contains('dark')); });
+
+      // Escape HTML for safe insertion
+      function escapeHtml(str) {
+        return String(str || '').replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
       }
     </script>
   </body>
