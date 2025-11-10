@@ -138,7 +138,7 @@ async def login(name: str = Form(...), roll: str = Form(...)):
 @app.post("/spoof")
 async def spoof(
     image: UploadFile = File(...),
-    authorization: Optional[str] = Header(None)  # optional, keep if you need it later
+    authorization: Optional[str] = Header(None)
 ):
     try:
         content = await image.read()
@@ -158,6 +158,7 @@ async def spoof(
     except Exception as e:
         logger.error(f"/spoof error: {e}\n{traceback.format_exc()}")
         return {"success": False, "reason": "Internal server error"}
+
 
 @app.post("/mark_attendance")
 async def mark_attendance(
@@ -262,7 +263,10 @@ async def mark_attendance(
             "similarity": "",
             "reason": "Internal server error"
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> deep_branch
 
 #--------------- view logs ----------
 def _tail_filter_log(
@@ -271,10 +275,6 @@ def _tail_filter_log(
     level: Optional[str],
     grep: Optional[str],
 ):
-    """
-    Read log file line-by-line, keep only the last `max_lines` lines after optional filters.
-    Uses deque to avoid loading whole file into memory.
-    """
     max_lines = max(1, min(max_lines, 5000))  # cap to avoid abuse
     level = (level or "").strip().upper() or None
     grep_low = (grep or "").lower() or None
@@ -309,9 +309,9 @@ def _tail_filter_log(
 @app.get("/logs", response_class=PlainTextResponse)
 def get_logs(
     lines: int = 200,
-    level: Optional[str] = None,   # e.g., INFO, WARNING, ERROR
-    grep: Optional[str] = None,    # substring match, case-insensitive
-    raw: bool = True               # return plain text when True; JSON when False
+    level: Optional[str] = None,
+    grep: Optional[str] = None,
+    raw: bool = True
 ):
     log_path = getattr(logger, "log_path", None)
     if not log_path:
