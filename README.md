@@ -38,74 +38,159 @@ This is the application layer for student management.
 
 ---
 
-## Project Structure
+##  Project Architecture
 
-APR/ ├── backend/ # FastAPI Application and Models │ ├── entrypoint/ │ ├── files/ │ ├── logs/ # Runtime logs and attendance records │ ├── models/ # Anti-spoofing model files (YOLO11m) │ ├── main.py # FastAPI entry point │ └── requirements.txt # Backend dependencies │ ├── frontend/ # Static Web Application │ ├── js/ # Core JavaScript logic (API, Camera, Main) │ ├── index.html # Home page │ ├── login.html │ ├── markattendance.html # Attendance marking page with camera │ └── register.html │ └── notebooks/ # Training and Exploration Scripts
+```
+APR/
+├── backend/
+│   ├── entrypoint/
+│   ├── files/
+│   ├── logs/
+│   ├── models/                # Trained YOLO11m anti-spoof model
+│   ├── main.py                # FastAPI entry point
+│   ├── API_docs.txt
+│   ├── render.yaml
+│   ├── requirements.txt
+│   └── ...
+│
+├── frontend/
+│   ├── assets/
+│   │   └── logo.png
+│   ├── js/
+│   │   ├── api.js
+│   │   ├── camera.js
+│   │   ├── config.js
+│   │   └── main.js
+│   ├── index.html
+│   ├── login.html
+│   ├── markattendance.html
+│   └── register.html
+│
+└── notebooks/
+    └── sample_dataset/
+```
+##  Face Anti-Spoofing using YOLO11m
 
+###  Objective
+
+Detect whether the detected face in the webcam feed is:
+
+* 🟢 **Real / Live**
+* 🔴 **Spoof / Fake (e.g., printed photo or phone screen)**
+
+###  Model Details
+
+| Feature          | Description                                      |
+| ---------------- | ------------------------------------------------ |
+| **Base Model**   | `yolo11m.pt`                                     |
+| **Task**         | Binary classification – Real vs Spoof            |
+| **Approach**     | Transfer Learning (fine-tuning last YOLO layers) |
+| **Framework**    | PyTorch + Ultralytics YOLOv11                    |
+| **Input Source** | Live webcam frames                               |
+
+###  Dataset
+
+| Split                | Persons | Description                        |
+| -------------------- | ------- | ---------------------------------- |
+| **Train (70%)**      | 2       | Real faces + Spoof (phone screen)  |
+| **Validation (20%)** | 1       | Unseen identity for generalization |
+| **Test (10%)**       | 1       | Unseen identity for evaluation     |
+
+This split ensures the model generalizes across different people and doesn’t simply memorize faces.
+
+###  Components
+
+* **Frontend:** HTML, TailwindCSS, JavaScript (Live Camera)
+* **Backend:** FastAPI (Python)
+* **Model:** YOLO11m Transfer-Learned Anti-Spoofing
+* **Database:** JSON / CSV (configurable for production DB)
 
 ---
 
-## Setup and Execution Guide
+## Backend Setup (FastAPI)
 
-### 1. Backend Setup (FastAPI)
-
-The backend must be running to handle all attendance and anti-spoofing requests.
-
-**A. Virtual Environment Setup**
+### Create and Activate Virtual Environment
 
 ```bash
 cd APR/backend
 python -m venv venv
-# Activate the environment
-source venv/bin/activate       # macOS/Linux
-# OR
-venv\Scripts\activate          # Windows
-B. Dependency Installation
+# On macOS/Linux
+source venv/bin/activate
+# On Windows
+venv\Scripts\activate
+```
 
-Install all required Python packages:
+### Install Dependencies
 
-Bash
-
+```bash
 pip install -r requirements.txt
-# Ensure core dependencies are present
+# If needed
 pip install fastapi uvicorn python-multipart
-C. Running the Server
+```
 
-Start the FastAPI server using Uvicorn:
+###  Run Backend Server
 
-Bash
-
+```bash
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-The backend API will be accessible at http://127.0.0.1:8000.
+```
 
-Key API Endpoints:
+Backend will be available at:
+**[http://127.0.0.1:8000](http://127.0.0.1:8000)**
 
-POST /register: Register a new student.
+### Example API Endpoints
 
-POST /mark_attendance: Mark attendance after successful spoof detection.
+| Method | Endpoint           | Description                  |
+| ------ | ------------------ | ---------------------------- |
+| `POST` | `/register`        | Register a new student       |
+| `POST` | `/mark_attendance` | Mark attendance              |
+| `POST` | `/detect`          | Perform anti-spoof detection |
+| `GET`  | `/api/v1/...`      | Fetch API resources          |
 
-POST /detect: Spoof detection service.
+Logs are stored in `backend/logs/`.
 
-2. Frontend Setup (HTML + JS)
-The frontend is a static web application that requires a local server for secure access to the webcam.
+---
 
-Recommended Method (VS Code Live Server):
+##  Frontend Setup (HTML + JS + TailwindCSS)
 
-Open the APR/frontend directory in Visual Studio Code.
+### Option 1 — Using VS Code Live Server (Recommended)
 
-Right-click on index.html and select “Open with Live Server”.
+1. Open folder:
 
-The application will be served, typically at: http://127.0.0.1:5500/
+   ```bash
+   cd APR/frontend
+   ```
+2. Right-click `index.html` → **Open with Live Server**
+3. Visit: **[http://127.0.0.1:5500/](http://127.0.0.1:5500/)**
 
-Key Frontend Pages:
+### Pages
 
-index.html: Project Home.
+| Page                  | Description             |
+| --------------------- | ----------------------- |
+| `index.html`          | Home page               |
+| `login.html`          | Student login           |
+| `register.html`       | Student registration    |
+| `markattendance.html` | Camera-based attendance |
 
-markattendance.html: Camera interface for attendance marking.
+---
 
-3. Execution Sequence
-Start Backend (See Step 1.C).
+## Example Run Sequence
 
-Start Frontend (See Step 2).
+1. **Start Backend**
 
-Access the application URL (e.g., http://127.0.0.1:5500/), proceed to log in, and mark attendance using the camera. The system will automatically perform the Anti-Spoofing check before logging the attendance.
+   ```bash
+   cd APR/backend
+   uvicorn main:app --reload --port 8000
+   ```
+
+2. **Launch Frontend**
+
+   * Open `index.html` in browser via Live Server.
+
+3. **Workflow**
+
+   * Login → Open Camera → Face Detection & Anti-Spoof → Attendance Marked ✅
+
+---
+This project is for **educational and research purposes only**.
+Commercial use or redistribution requires explicit permission from the author.
+---
