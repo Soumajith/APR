@@ -263,10 +263,6 @@ async def mark_attendance(
             "similarity": "",
             "reason": "Internal server error"
         }
-<<<<<<< HEAD
-
-=======
->>>>>>> deep_branch
 
 #--------------- view logs ----------
 def _tail_filter_log(
