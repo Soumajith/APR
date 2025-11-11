@@ -15,7 +15,6 @@
       }
     };
   </script>
-
   <style>
     body {
       background: linear-gradient(180deg, #f4f4f9, #eef2ff);
@@ -23,13 +22,11 @@
       display: flex;
       flex-direction: column;
     }
-
     nav {
       position: sticky;
       top: 0;
       z-index: 50;
     }
-
     .card {
       background: white;
       border-radius: 1rem;
@@ -42,14 +39,12 @@
       flex-direction: column;
       justify-content: flex-start;
     }
-
     .card h2 {
       margin-bottom: 1.25rem;
       font-size: 1.5rem;
       font-weight: 600;
       text-align: center;
     }
-
     input[type="text"] {
       width: 100%;
       padding: 0.6rem 0.75rem;
@@ -57,13 +52,11 @@
       border-radius: 0.5rem;
       font-size: 0.95rem;
     }
-
     input:focus {
       border-color: #2563eb;
       outline: none;
       box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
     }
-
     #login-btn {
       background: #2563eb;
       color: white;
@@ -71,15 +64,12 @@
       border-radius: 0.5rem;
       font-weight: 500;
     }
-
     #login-btn:hover {
       background: #1e3a8a;
     }
   </style>
 </head>
-
 <body>
-  <!-- NAV -->
   <nav class="w-full bg-gradient-to-r from-secondary to-primary text-white shadow flex justify-between items-center px-6 py-3">
     <div class="flex items-center gap-3">
       <img src="./assets/logo.png" class="w-8 h-8 rounded-full" alt="logo" />
@@ -93,82 +83,67 @@
       <a href="/register.html" class="text-white/90 hover:underline">Register Student</a>
     </div>
   </nav>
-
-  <!-- Login Card -->
   <main class="card">
     <h2 class="text-2xl font-semibold mb-4 text-center">Student Login</h2>
-
     <form id="login-form" class="space-y-4" autocomplete="off" spellcheck="false">
       <div>
         <label class="block text-sm font-medium mb-1">Name</label>
         <input id="login-name" type="text" required placeholder="John Doe" />
       </div>
-
       <div>
         <label class="block text-sm font-medium mb-1">Roll Number</label>
         <input id="login-roll" type="text" required placeholder="22CS001" />
       </div>
-
       <div class="flex items-center justify-between">
         <button type="submit" id="login-btn">Login</button>
         <a href="/register.html" class="text-sm text-primary underline">Register student</a>
       </div>
-
       <div id="login-msg" class="text-sm mt-2"></div>
     </form>
   </main>
-
   <footer class="text-center text-sm text-gray-600 mt-auto mb-6">
     &copy; <span id="year"></span> Smart Attendance
   </footer>
-
   <script type="module">
-  import { LOGIN_API } from './js/config.js';
-  document.getElementById('year').textContent = new Date().getFullYear();
-
-  const loginForm = document.getElementById('login-form');
-  const loginMsg = document.getElementById('login-msg');
-
-  loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    loginMsg.textContent = '';
-
-    const name = document.getElementById('login-name').value.trim();
-    const roll = document.getElementById('login-roll').value.trim();
-    const btn = document.getElementById('login-btn');
-    btn.disabled = true;
-    btn.textContent = 'Signing in...';
-
-    try {
-      const res = await fetch(LOGIN_API, {
-        method: "POST",
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: new URLSearchParams({ name, roll }) // ✅ Form encoded
-      });
-
-      const data = await res.json();
-
-      if (res.ok && data.success) {
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("userName", data.student?.name || name);
-        localStorage.setItem("userRoll", data.student?.roll || roll);
-        loginMsg.innerHTML = '<span class="text-green-600">Login successful — redirecting...</span>';
-        setTimeout(() => window.location.href = '/markattendance.html', 600);
-      } else {
-        loginMsg.innerHTML = `<span class="text-red-600">${data.message || "Invalid credentials"}</span>`;
+    import { LOGIN_API } from './js/config.js';
+    document.getElementById('year').textContent = new Date().getFullYear();
+    const loginForm = document.getElementById('login-form');
+    const loginMsg = document.getElementById('login-msg');
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      loginMsg.textContent = '';
+      const name = document.getElementById('login-name').value.trim();
+      const roll = document.getElementById('login-roll').value.trim();
+      const btn = document.getElementById('login-btn');
+      btn.disabled = true;
+      btn.textContent = 'Signing in...';
+      try {
+        const res = await fetch(LOGIN_API, {
+          method: "POST",
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body: new URLSearchParams({ name, roll })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          localStorage.setItem("isLoggedIn", "true");
+          localStorage.setItem("userName", data.student?.name || name);
+          localStorage.setItem("userRoll", data.student?.roll || roll);
+          loginMsg.innerHTML = '<span class="text-green-600">Login successful — redirecting...</span>';
+          setTimeout(() => window.location.href = '/markattendance.html', 600);
+        } else {
+          loginMsg.innerHTML = `<span class="text-red-600">${data.message || "Invalid credentials"}</span>`;
+        }
+      } catch (err) {
+        console.error('Login error', err);
+        loginMsg.innerHTML = `<span class="text-red-600">Network error: ${err.message || err}</span>`;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Login';
       }
-    } catch (err) {
-      console.error('Login error', err);
-      loginMsg.innerHTML = `<span class="text-red-600">Network error: ${err.message || err}</span>`;
-    } finally {
-      btn.disabled = false;
-      btn.textContent = 'Login';
-    }
-  });
-</script>
-
+    });
+  </script>
 </body>
 </html>
