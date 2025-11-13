@@ -12,33 +12,33 @@ The architecture consists of a robust **FastAPI** backend handling the computer 
 
 The core of the security mechanism is the FAS module, which validates the authenticity of the presented face.
 
-* **Model:** YOLO11m (Transfer Learning approach).
-* **Task:** Binary Classification (Real vs. Spoof).
-* **Methodology:** The pre-trained `yolo11m.pt` model was fine-tuned on a custom webcam-collected dataset.
-* **Dataset Integrity:** Data was split strictly by **unseen identities** (70% Train, 20% Validation, 10% Test) to ensure the model's ability to generalize robustly across new users.
-* **YOLO Rationale:** YOLO feature maps are leveraged to capture essential anti-spoofing cues, including subtle differences in **skin texture**, **reflective patterns** on screens, and **sharp edges/pixel noise** inherent to digital displays.
+- **Model:** YOLO11m (Transfer Learning approach).
+- **Task:** Binary Classification (Real vs. Spoof).
+- **Methodology:** The pre-trained `yolo11m.pt` model was fine-tuned on a custom webcam-collected dataset.
+- **Dataset Integrity:** Data was split strictly by **unseen identities** (70% Train, 20% Validation, 10% Test) to ensure the model's ability to generalize robustly across new users.
+- **YOLO Rationale:** YOLO feature maps are leveraged to capture essential anti-spoofing cues, including subtle differences in **skin texture**, **reflective patterns** on screens, and **sharp edges/pixel noise** inherent to digital displays.
 
 ### 2. Smart Attendance System
 
 This is the application layer for student management.
 
-* **Functionality:** Includes user registration, login, and camera-based attendance marking.
-* **Backend (FastAPI):** Handles face detection, the real-time spoof detection logic, and persistence of attendance records.
-* **Frontend (HTML/JS):** Manages the user interface, camera stream acquisition, and asynchronous communication with the backend APIs.
+- **Functionality:** Includes user registration, login, and camera-based attendance marking.
+- **Backend (FastAPI):** Handles face detection, the real-time spoof detection logic, and persistence of attendance records.
+- **Frontend (HTML/JS):** Manages the user interface, camera stream acquisition, and asynchronous communication with the backend APIs.
 
 ---
 
 ## Technology Stack
 
-| Component | Technology | Role |
-| :--- | :--- | :--- |
-| **Backend** | Python, **FastAPI**, Uvicorn | API orchestration, Spoof Detection logic, Attendance Logging. |
-| **Model** | **YOLO11m**, PyTorch/Ultralytics | Real-time face anti-spoofing prediction. |
-| **Frontend** | HTML5, JavaScript, **TailwindCSS** | User Interface, Webcam stream handling, API communication. |
+| Component    | Technology                         | Role                                                          |
+| :----------- | :--------------------------------- | :------------------------------------------------------------ |
+| **Backend**  | Python, **FastAPI**, Uvicorn       | API orchestration, Spoof Detection logic, Attendance Logging. |
+| **Model**    | **YOLO11m**, PyTorch/Ultralytics   | Real-time face anti-spoofing prediction.                      |
+| **Frontend** | HTML5, JavaScript, **TailwindCSS** | User Interface, Webcam stream handling, API communication.    |
 
 ---
 
-##  Project Architecture
+## Project Architecture
 
 ```
 APR/
@@ -69,16 +69,17 @@ APR/
 └── notebooks/
     └── sample_dataset/
 ```
-##  Face Anti-Spoofing using YOLO11m
 
-###  Objective
+## Face Anti-Spoofing using YOLO11m
+
+### Objective
 
 Detect whether the detected face in the webcam feed is:
 
-* 🟢 **Real / Live**
-* 🔴 **Spoof / Fake (e.g., printed photo or phone screen)**
+- 🟢 **Real / Live**
+- 🔴 **Spoof / Fake (e.g., printed photo or phone screen)**
 
-###  Model Details
+### Model Details
 
 | Feature          | Description                                      |
 | ---------------- | ------------------------------------------------ |
@@ -88,7 +89,7 @@ Detect whether the detected face in the webcam feed is:
 | **Framework**    | PyTorch + Ultralytics YOLOv11                    |
 | **Input Source** | Live webcam frames                               |
 
-###  Dataset
+### Dataset
 
 | Split                | Persons | Description                        |
 | -------------------- | ------- | ---------------------------------- |
@@ -98,12 +99,12 @@ Detect whether the detected face in the webcam feed is:
 
 This split ensures the model generalizes across different people and doesn’t simply memorize faces.
 
-###  Components
+### Components
 
-* **Frontend:** HTML, TailwindCSS, JavaScript (Live Camera)
-* **Backend:** FastAPI (Python)
-* **Model:** YOLO11m Transfer-Learned Anti-Spoofing
-* **Database:** JSON / CSV (configurable for production DB)
+- **Frontend:** HTML, TailwindCSS, JavaScript (Live Camera)
+- **Backend:** FastAPI (Python)
+- **Model:** YOLO11m Transfer-Learned Anti-Spoofing
+- **Database:** JSON / CSV (configurable for production DB)
 
 ---
 
@@ -116,8 +117,8 @@ cd APR/backend
 python -m venv venv
 # On macOS/Linux
 source venv/bin/activate
-# On Windows
-venv\Scripts\activate
+source venv/bin/activate       # Linux/macOS
+# venv\Scripts\activate          # Windows (Command Prompt)
 ```
 
 ### Install Dependencies
@@ -128,7 +129,7 @@ pip install -r requirements.txt
 pip install fastapi uvicorn python-multipart
 ```
 
-###  Run Backend Server
+### Run Backend Server
 
 ```bash
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
@@ -150,7 +151,7 @@ Logs are stored in `backend/logs/`.
 
 ---
 
-##  Frontend Setup (HTML + JS + TailwindCSS)
+## Frontend Setup (HTML + JS + TailwindCSS)
 
 ### Option 1 — Using VS Code Live Server (Recommended)
 
@@ -159,6 +160,7 @@ Logs are stored in `backend/logs/`.
    ```bash
    cd APR/frontend
    ```
+
 2. Right-click `index.html` → **Open with Live Server**
 3. Visit: **[http://127.0.0.1:5500/](http://127.0.0.1:5500/)**
 
@@ -184,13 +186,15 @@ Logs are stored in `backend/logs/`.
 
 2. **Launch Frontend**
 
-   * Open `index.html` in browser via Live Server.
+   - Open `index.html` in browser via Live Server.
 
 3. **Workflow**
 
-   * Login → Open Camera → Face Detection & Anti-Spoof → Attendance Marked ✅
+   - Login → Open Camera → Face Detection & Anti-Spoof → Attendance Marked ✅
 
 ---
+
 This project is for **educational and research purposes only**.
 Commercial use or redistribution requires explicit permission from the author.
+
 ---
