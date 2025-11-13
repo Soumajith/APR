@@ -1,8 +1,10 @@
 # Real-Time Face Anti-Spoofing and Smart Attendance System
 
-This project implements a **Real-Time Face Anti-Spoofing (FAS)** mechanism using a fine-tuned **YOLO11m** model, integrated into a comprehensive **Smart Attendance System**. The system is designed to utilize computer vision for student attendance marking while rigorously preventing fraudulent attempts using images, videos, or displays (spoofing).
+This project implements a Real-Time Face Anti-Spoofing (FAS) mechanism using a fine-tuned YOLO11m model, integrated into a comprehensive Smart Attendance System. The system is designed to utilize computer vision for student attendance marking while rigorously preventing fraudulent attempts using images, videos, or displays (spoofing).
 
-The architecture consists of a robust **FastAPI** backend handling the computer vision tasks and a static **HTML/JavaScript/TailwindCSS** frontend for user interaction and webcam feed management.
+For identity verification, the system uses a separate pipeline to generate Face Embeddings using the FaceNet model, which are then compared to registered student embeddings.
+
+The architecture consists of a robust FastAPI backend handling the computer vision tasks and a static HTML/JavaScript/TailwindCSS frontend for user interaction and webcam feed management.
 
 ---
 
