@@ -1,10 +1,10 @@
-Face Anti-Spoofing using YOLO11m (Transfer Learning)
+## Face Anti-Spoofing using YOLO11m (Transfer Learning)
 
 This project builds a real-time face anti-spoofing system to detect if a face in the camera is real/live or spoof/fake (e.g., face displayed from a phone screen).
 
 The model is trained using YOLO11m with transfer learning on a custom webcam collected dataset.
 
-📌 Dataset
+## 📌 Dataset
 
 Custom data was collected using a laptop webcam.
 
@@ -15,7 +15,7 @@ Test (10%)	1 person	unseen identity
 
 This split ensures the model generalizes across identities (not memorizing faces).
 
-📌 Model
+## 📌 Model
 
 Base model: yolo11m.pt
 
@@ -23,28 +23,25 @@ Task: Binary classification → Real vs Spoof
 
 Approach: Transfer learning (fine-tuning last layers)
 
-📈 Training Graphs
 
-Below are the training & validation curves including loss, precision, recall, mAP50, mAP50-95:
 
-![alt text](image.png)
+## ✅ Results Summary
 
-✅ Results Summary
+1. Model converges well (loss decreasing)
 
-Model converges well (loss decreasing)
+2. High Precision & Recall on validation
 
-High Precision & Recall on validation
+3. Good generalization to unseen identity in validation & test
 
-Good generalization to unseen identity in validation & test
-
-🧠 Why YOLO11 for Anti-Spoof?
+## 🧠 Why YOLO11 for Anti-Spoof?
 
 YOLO feature maps capture:
 
-Skin texture
+1. Skin texture
 
-Reflective pattern on screens (spoof)
+2 .Reflective pattern on screens (spoof)
 
-Sharp edges / pixel noise on phone display
+3. Sharp edges / pixel noise on phone display
+
 
 These differences make YOLO embeddings a good base for anti-spoof detection.
