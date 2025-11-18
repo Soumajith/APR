@@ -1,12 +1,10 @@
 // js/main.js
-import { postForm } from "./api.js"; // if other code uses it; optional
+import { postForm } from "./api.js"; 
 
-// Grab navbar controls (IDs must match your HTML)
 const navRegister = document.getElementById("nav-register");
 const navAttendance = document.getElementById("nav-attendance");
 const themeToggle = document.getElementById("theme-toggle");
 
-// Simple auth utilities
 export function isLoggedIn() {
   const token = localStorage.getItem("authToken");
   return !!token;
@@ -15,14 +13,11 @@ export function isLoggedIn() {
 export function logout() {
   localStorage.removeItem("authToken");
   localStorage.removeItem("userName");
-  // optionally remove userRoll, courseId etc.
   window.location.href = "/login.html";
 }
 
-// When user clicks Mark Attendance
 navAttendance.onclick = () => {
   if (isLoggedIn()) {
-    // Open the standalone page (same tab)
     window.location.href = "/markattendance.html";
   } else {
     alert("Please login to mark attendance.");
@@ -48,7 +43,6 @@ function refreshNavUser() {
 }
 refreshNavUser();
 
-// theme toggle handler (if not present already)
 if (themeToggle) {
   const html = document.documentElement;
   themeToggle.addEventListener("click", () => {
