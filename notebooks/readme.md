@@ -39,9 +39,10 @@ YOLO feature maps capture:
 
 1. Skin texture
 
-2 .Reflective pattern on screens (spoof)
+2. Reflective pattern on screens (spoof)
 
 3. Sharp edges / pixel noise on phone display
 
 
 These differences make YOLO embeddings a good base for anti-spoof detection.
+
